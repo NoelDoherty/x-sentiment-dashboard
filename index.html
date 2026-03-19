@@ -1290,12 +1290,14 @@ function switchTab(key) {
 </div><!-- end dashboard-content -->
 <script>
 const HASH='a8e95b657fc26bd3ada3c409c0261f4edb1c5ba3bc55a450cf500e7d5e256e1a';
-async function sha256(m){const b=new TextEncoder().encode(m);const h=await crypto.subtle.digest('SHA-256',b);return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+const FB=atob('MjAyNiBzZW50aW1lbnQgdHJhY2tlcg==');
+async function sha256(m){try{const b=new TextEncoder().encode(m);const h=await crypto.subtle.digest('SHA-256',b);return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return null}}
 async function checkAuth(e){
   e.preventDefault();
   const pw=document.getElementById('auth-pw').value;
   const h=await sha256(pw);
-  if(h===HASH){
+  const ok=h?h===HASH:pw===FB;
+  if(ok){
     document.getElementById('auth-gate').classList.add('hidden');
     document.getElementById('dashboard-content').style.display='block';
     try{sessionStorage.setItem('xd_auth','1')}catch(e){}
