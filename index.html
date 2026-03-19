@@ -5,6 +5,17 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f172a;color:#e2e8f0;padding:20px}
+#auth-gate{position:fixed;inset:0;background:#0f172a;z-index:9999;display:flex;align-items:center;justify-content:center}
+#auth-gate.hidden{display:none}
+.auth-box{background:#1e293b;padding:40px;border-radius:16px;text-align:center;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.auth-box h2{color:#f8fafc;margin-bottom:6px;font-size:22px}
+.auth-box .sub{color:#94a3b8;font-size:13px;margin-bottom:24px}
+.auth-box input{width:100%;padding:12px 16px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#f8fafc;font-size:15px;outline:none;margin-bottom:14px}
+.auth-box input:focus{border-color:#3b82f6}
+.auth-box button{width:100%;padding:12px;border:none;border-radius:8px;background:#3b82f6;color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s}
+.auth-box button:hover{background:#2563eb}
+.auth-box .err{color:#ef4444;font-size:13px;margin-top:8px;min-height:20px}
+#dashboard-content{display:none}
 .dashboard-header{text-align:center;padding:20px 0 10px;border-bottom:1px solid #1e293b;margin-bottom:20px}
 .dashboard-header h1{font-size:28px;color:#f8fafc;margin-bottom:8px}
 .dashboard-header .subtitle{color:#94a3b8;font-size:14px}
@@ -35,6 +46,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .empty{color:#64748b;text-align:center;padding:40px}
 @media(max-width:768px){.charts-row{flex-direction:column}.tab-bar{gap:4px}}
 </style></head><body>
+<div id="auth-gate">
+<div class="auth-box">
+<h2>Sentiment Tracker</h2>
+<div class="sub">Enter password to access the dashboard</div>
+<form id="auth-form" onsubmit="return checkAuth(event)">
+<input type="password" id="auth-pw" placeholder="Password" autofocus>
+<button type="submit">Unlock</button>
+<div class="err" id="auth-err"></div>
+</form>
+</div>
+</div>
+<div id="dashboard-content">
 <div class="dashboard-header">
     <h1>X.com Sentiment Tracker</h1>
     <div class="subtitle">Real-time sentiment analysis across 8 topic layers | Updated 2026-03-19 19:24</div>
@@ -1263,5 +1286,26 @@ function switchTab(key) {
             options: {responsive:false, indexAxis:'y', plugins:{legend:{display:false}}}
         });
         
+</script>
+</div><!-- end dashboard-content -->
+<script>
+const HASH='a8e95b657fc26bd3ada3c409c0261f4edb1c5ba3bc55a450cf500e7d5e256e1a';
+async function sha256(m){const b=new TextEncoder().encode(m);const h=await crypto.subtle.digest('SHA-256',b);return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function checkAuth(e){
+  e.preventDefault();
+  const pw=document.getElementById('auth-pw').value;
+  const h=await sha256(pw);
+  if(h===HASH){
+    document.getElementById('auth-gate').classList.add('hidden');
+    document.getElementById('dashboard-content').style.display='block';
+    try{sessionStorage.setItem('xd_auth','1')}catch(e){}
+  }else{
+    document.getElementById('auth-err').textContent='Incorrect password';
+    document.getElementById('auth-pw').value='';
+    document.getElementById('auth-pw').focus();
+  }
+  return false;
+}
+(function(){try{if(sessionStorage.getItem('xd_auth')==='1'){document.getElementById('auth-gate').classList.add('hidden');document.getElementById('dashboard-content').style.display='block';}}catch(e){}})();
 </script>
 </body></html>
