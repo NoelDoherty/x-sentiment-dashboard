@@ -3,520 +3,361 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>X Sentiment Dashboard — AI Agents & More</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<title>X Sentiment Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f172a;color:#e2e8f0;padding:20px;}
-.header{text-align:center;margin-bottom:30px;}
-.header h1{font-size:28px;color:#f8fafc;margin-bottom:5px;}
-.header .meta{color:#94a3b8;font-size:14px;}
-.dashboard{max-width:1200px;margin:0 auto;}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:30px;}
-.card{background:#1e293b;border-radius:12px;padding:16px;transition:transform 0.2s;}
-.card:hover{transform:translateY(-2px);background:#263348;}
-.card h3{font-size:16px;margin-bottom:8px;color:#f1f5f9;}
-.stats-row{display:flex;gap:12px;margin-bottom:6px;}
-.stat{font-size:13px;color:#94a3b8;}
-.stat.positive{color:#4ade80;}
-.stat.negative{color:#f87171;}
-.stat.neutral{color:#fbbf24;}
-.score{font-size:12px;color:#64748b;}
-.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:30px;}
-.chart-box{background:#1e293b;border-radius:12px;padding:20px;}
-.chart-box h3{margin-bottom:12px;color:#f1f5f9;font-size:16px;}
-canvas{max-height:300px;}
-.layer-section{background:#1e293b;border-radius:12px;padding:20px;margin-bottom:20px;}
-.layer-section h2{margin-bottom:16px;font-size:20px;}
-.tweet{background:#0f172a;border-radius:8px;padding:12px;margin-bottom:10px;border-left:3px solid #334155;}
-.tweet.positive{border-left-color:#4ade80;}
-.tweet.negative{border-left-color:#f87171;}
-.tweet.neutral{border-left-color:#fbbf24;}
-.tweet-header{display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;}
-.handle{color:#64748b;}
-.tweet-sentiment{font-size:12px;}
-.tweet-text{font-size:14px;line-height:1.5;margin-bottom:8px;color:#cbd5e1;}
-.tweet-meta{font-size:11px;color:#64748b;}
-.trending-section{background:#1e293b;border-radius:12px;padding:20px;margin-bottom:20px;}
-.trending-item{padding:8px 0;border-bottom:1px solid #334155;}
-.trending-meta{color:#64748b;font-size:12px;margin-left:8px;}
-.empty{color:#64748b;font-style:italic;}
-.summary-bar{display:flex;gap:20px;justify-content:center;margin-bottom:24px;}
-.summary-item{background:#1e293b;border-radius:8px;padding:12px 24px;text-align:center;}
-.summary-item .num{font-size:24px;font-weight:bold;color:#f8fafc;}
-.summary-item .lbl{font-size:12px;color:#94a3b8;}
-@media(max-width:768px){.charts-row{grid-template-columns:1fr;} .cards{grid-template-columns:1fr;}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0f;color:#e0e0e0;padding:20px}
+h1{text-align:center;color:#00d4ff;font-size:2em;margin-bottom:5px}
+.subtitle{text-align:center;color:#888;margin-bottom:20px;font-size:0.9em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:24px}
+.card{background:#16161e;border-radius:12px;padding:18px;border:1px solid #2a2a3a}
+.card h3{color:#00d4ff;margin-bottom:12px;font-size:1.1em}
+.stat{font-size:2.2em;font-weight:700;color:#fff}
+.stat-label{color:#888;font-size:0.85em}
+.sentiment-bar{display:flex;height:24px;border-radius:6px;overflow:hidden;margin:8px 0}
+.sentiment-bar .pos{background:#22c55e}.sentiment-bar .neu{background:#666}.sentiment-bar .neg{background:#ef4444}
+.tweet{padding:10px;border-bottom:1px solid #2a2a3a;font-size:0.85em}
+.tweet:last-child{border-bottom:none}
+.tweet .handle{color:#00d4ff;font-weight:600}.tweet .time{color:#666;font-size:0.8em}
+.tweet .text{margin:4px 0;color:#ccc}.tweet .metrics{color:#888;font-size:0.75em}
+.sentiment-pos{color:#22c55e}.sentiment-neg{color:#ef4444}.sentiment-neu{color:#888}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tab{padding:8px 16px;border-radius:8px;background:#1e1e2e;color:#aaa;cursor:pointer;border:1px solid #2a2a3a;font-size:0.85em}
+.tab.active{background:#00d4ff;color:#000;border-color:#00d4ff;font-weight:600}
+.chart-container{position:relative;height:300px;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:0.85em}
+th,td{padding:8px;text-align:left;border-bottom:1px solid #2a2a3a}
+th{color:#00d4ff}
+.log-success{color:#22c55e}.log-error{color:#ef4444}
+.trending-item{padding:6px 0;border-bottom:1px solid #1a1a2a}
+.trending-topic{font-weight:600;color:#fff}.trending-cat{color:#888;font-size:0.8em}
 </style>
 </head>
 <body>
-<div class="dashboard">
-    <div class="header">
-        <h1>📊 X Sentiment Dashboard</h1>
-        <div class="meta">Last updated: 2026-03-20 08:13 UTC &nbsp;|&nbsp; 25 total posts &nbsp;|&nbsp; 8 scrapes</div>
+<h1>X Sentiment Dashboard</h1>
+<p class="subtitle">Last updated: 2026-03-20 09:15 UTC | Total posts: 42</p>
+
+<div class="grid">
+
+  <div class="card">
+    <h3>AI Agents</h3>
+    <div class="stat">5</div><div class="stat-label">posts tracked</div>
+    <div style="margin-top:8px;color:#ef4444;font-weight:600">Avg sentiment: -0.200</div>
+    <div class="sentiment-bar">
+      <div class="pos" style="width:0%" title="0 positive"></div>
+      <div class="neu" style="width:80%" title="4 neutral"></div>
+      <div class="neg" style="width:20%" title="1 negative"></div>
     </div>
-
-    <div class="summary-bar">
-        <div class="summary-item"><div class="num">25</div><div class="lbl">Total Posts</div></div>
-        <div class="summary-item"><div class="num">8</div><div class="lbl">Layers</div></div>
-        <div class="summary-item"><div class="num">8</div><div class="lbl">Scrapes</div></div>
+    <div style="font-size:0.75em;color:#888">🟢 0 positive · ⚪ 4 neutral · 🔴 1 negative</div>
+  </div>
+  <div class="card">
+    <h3>Crypto AI</h3>
+    <div class="stat">7</div><div class="stat-label">posts tracked</div>
+    <div style="margin-top:8px;color:#22c55e;font-weight:600">Avg sentiment: +0.143</div>
+    <div class="sentiment-bar">
+      <div class="pos" style="width:14%" title="1 positive"></div>
+      <div class="neu" style="width:85%" title="6 neutral"></div>
+      <div class="neg" style="width:0%" title="0 negative"></div>
     </div>
-
-    <div class="cards">
-        <div class="card" onclick="showLayer('agents')" style="border-left: 4px solid #3b82f6; cursor:pointer;">
-            <h3>AI Agents 🟡</h3>
-            <div class="stats-row">
-                <span class="stat">5 posts</span>
-                <span class="stat positive">+0</span>
-                <span class="stat negative">-0</span>
-                <span class="stat neutral">~5</span>
-            </div>
-            <div class="score">Avg sentiment: 0.000</div>
-        </div>
-        <div class="card" onclick="showLayer('crypto')" style="border-left: 4px solid #f59e0b; cursor:pointer;">
-            <h3>Crypto AI 🟡</h3>
-            <div class="stats-row">
-                <span class="stat">6 posts</span>
-                <span class="stat positive">+0</span>
-                <span class="stat negative">-0</span>
-                <span class="stat neutral">~6</span>
-            </div>
-            <div class="score">Avg sentiment: 0.000</div>
-        </div>
-        <div class="card" onclick="showLayer('xrp')" style="border-left: 4px solid #10b981; cursor:pointer;">
-            <h3>XRP / Ripple 🟢</h3>
-            <div class="stats-row">
-                <span class="stat">3 posts</span>
-                <span class="stat positive">+1</span>
-                <span class="stat negative">-0</span>
-                <span class="stat neutral">~2</span>
-            </div>
-            <div class="score">Avg sentiment: 0.333</div>
-        </div>
-        <div class="card" onclick="showLayer('singularity')" style="border-left: 4px solid #8b5cf6; cursor:pointer;">
-            <h3>Singularity / AGI 🟢</h3>
-            <div class="stats-row">
-                <span class="stat">3 posts</span>
-                <span class="stat positive">+1</span>
-                <span class="stat negative">-0</span>
-                <span class="stat neutral">~2</span>
-            </div>
-            <div class="score">Avg sentiment: 0.333</div>
-        </div>
-        <div class="card" onclick="showLayer('local_ai')" style="border-left: 4px solid #ef4444; cursor:pointer;">
-            <h3>Local AI 🟡</h3>
-            <div class="stats-row">
-                <span class="stat">3 posts</span>
-                <span class="stat positive">+0</span>
-                <span class="stat negative">-0</span>
-                <span class="stat neutral">~3</span>
-            </div>
-            <div class="score">Avg sentiment: 0.000</div>
-        </div>
-        <div class="card" onclick="showLayer('indie_saas')" style="border-left: 4px solid #ec4899; cursor:pointer;">
-            <h3>Indie SaaS 🟡</h3>
-            <div class="stats-row">
-                <span class="stat">3 posts</span>
-                <span class="stat positive">+0</span>
-                <span class="stat negative">-0</span>
-                <span class="stat neutral">~3</span>
-            </div>
-            <div class="score">Avg sentiment: 0.000</div>
-        </div>
-        <div class="card" onclick="showLayer('pm_ai')" style="border-left: 4px solid #06b6d4; cursor:pointer;">
-            <h3>PM + AI 🔴</h3>
-            <div class="stats-row">
-                <span class="stat">2 posts</span>
-                <span class="stat positive">+0</span>
-                <span class="stat negative">-1</span>
-                <span class="stat neutral">~1</span>
-            </div>
-            <div class="score">Avg sentiment: -0.500</div>
-        </div>
-        <div class="card" onclick="showLayer('trending')" style="border-left: 4px solid #6b7280; cursor:pointer;">
-            <h3>Trending 🟡</h3>
-            <div class="stats-row">
-                <span class="stat">0 posts</span>
-                <span class="stat positive">+0</span>
-                <span class="stat negative">-0</span>
-                <span class="stat neutral">~0</span>
-            </div>
-            <div class="score">Avg sentiment: 0.000</div>
-        </div></div>
-
-    <div class="charts-row">
-        <div class="chart-box">
-            <h3>Sentiment Breakdown by Layer</h3>
-            <canvas id="sentimentChart"></canvas>
-        </div>
-        <div class="chart-box">
-            <h3>Post Volume by Layer</h3>
-            <canvas id="volumeChart"></canvas>
-        </div>
+    <div style="font-size:0.75em;color:#888">🟢 1 positive · ⚪ 6 neutral · 🔴 0 negative</div>
+  </div>
+  <div class="card">
+    <h3>XRP/Ripple</h3>
+    <div class="stat">7</div><div class="stat-label">posts tracked</div>
+    <div style="margin-top:8px;color:#22c55e;font-weight:600">Avg sentiment: +0.143</div>
+    <div class="sentiment-bar">
+      <div class="pos" style="width:14%" title="1 positive"></div>
+      <div class="neu" style="width:85%" title="6 neutral"></div>
+      <div class="neg" style="width:0%" title="0 negative"></div>
     </div>
-
-    
-        <div class="layer-section" id="layer-agents" style="display:none;">
-            <h2 style="color:#3b82f6">AI Agents</h2>
-            
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Ejaaz</strong> <span class="handle">Ejaaz</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">someone built tool that transports your AI agents into a video game. instead of tracking 10+ conversations you can just watch them in an office.</div>
-                <div class="tweet-meta">
-                    ❤️ 0 &nbsp; 🔁 0 &nbsp; 💬 0 &nbsp; 👁 0
-                    &nbsp; | &nbsp; 2026-03-20T08:07:21.170063
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Julian Goldie SEO</strong> <span class="handle">Julian Goldie SEO</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">There's a free 120 billion parameter AI you can run on your own computer. Zero internet. Zero API costs. Zero monthly fees. It's called Nvidia Nemotron 3 Super.</div>
-                <div class="tweet-meta">
-                    ❤️ 248 &nbsp; 🔁 37 &nbsp; 💬 17 &nbsp; 👁 19K
-                    &nbsp; | &nbsp; 2026-03-20T08:07:21.167985
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>0xMarioNawfal</strong> <span class="handle">0xMarioNawfal</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</div>
-                <div class="tweet-meta">
-                    ❤️ 1.9K &nbsp; 🔁 184 &nbsp; 💬 89 &nbsp; 👁 213K
-                    &nbsp; | &nbsp; 2026-03-20T08:07:21.165864
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Kyle Chassé</strong> <span class="handle">Kyle Chassé</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">NVIDIA JUST SOLVED THE AGENT TRUST PROBLEM. OpenShell dropped two days ago. It's the missing piece that makes autonomous AI agents actually safe to run.</div>
-                <div class="tweet-meta">
-                    ❤️ 749 &nbsp; 🔁 63 &nbsp; 💬 36 &nbsp; 👁 174K
-                    &nbsp; | &nbsp; 2026-03-20T08:07:21.162597
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>TFTC</strong> <span class="handle">TFTC</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">Jensen Huang: If that $500,000 engineer did not consume at least $250,000 worth of tokens, I am going to be deeply alarmed.</div>
-                <div class="tweet-meta">
-                    ❤️ 6.7K &nbsp; 🔁 758 &nbsp; 💬 336 &nbsp; 👁 1.5M
-                    &nbsp; | &nbsp; 2026-03-20T08:07:21.149682
-                </div>
-            </div>
-        </div>
-        <div class="layer-section" id="layer-crypto" style="display:none;">
-            <h2 style="color:#f59e0b">Crypto AI</h2>
-            
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>naiive</strong> <span class="handle">naiive</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">2018: graphic designer. 2022: Crypto trader. 2023: Prompt engineer. 2026: AI agents. 2028: Farmer</div>
-                <div class="tweet-meta">
-                    ❤️ 2.1K &nbsp; 🔁 286 &nbsp; 💬 80 &nbsp; 👁 109K
-                    &nbsp; | &nbsp; 2026-03-20T08:08:21.535990
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>LCX</strong> <span class="handle">LCX</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">Buy 500 USDC worth of ETH on LCX. With Claude, ChatGPT, Copilot, or Gemini, you can now trade crypto on a regulated exchange.</div>
-                <div class="tweet-meta">
-                    ❤️ 40 &nbsp; 🔁 17 &nbsp; 💬 4 &nbsp; 👁 1.1K
-                    &nbsp; | &nbsp; 2026-03-20T08:08:21.534057
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Joshuwa Roomsburg</strong> <span class="handle">Joshuwa Roomsburg</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">LCX is giving AI tools direct access to a crypto exchange. That puts $LCX inside the shift toward AI agents using real market infrastructure.</div>
-                <div class="tweet-meta">
-                    ❤️ 0 &nbsp; 🔁 0 &nbsp; 💬 0 &nbsp; 👁 0
-                    &nbsp; | &nbsp; 2026-03-20T08:08:21.531912
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Tuki</strong> <span class="handle">Tuki</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">The CEO of Coinbase just said something nobody is taking seriously enough. AI agents will outnumber humans in transactions. Soon.</div>
-                <div class="tweet-meta">
-                    ❤️ 12K &nbsp; 🔁 1.7K &nbsp; 💬 533 &nbsp; 👁 2.3M
-                    &nbsp; | &nbsp; 2026-03-20T08:08:21.529476
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>0xMarioNawfal</strong> <span class="handle">0xMarioNawfal</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">AI AGENTS CAN NOW USE CRYPTO FULLY AUTONOMOUS. PAY, TRADE, BUILD APPS, ALL IN 1 PROMPT</div>
-                <div class="tweet-meta">
-                    ❤️ 368 &nbsp; 🔁 45 &nbsp; 💬 49 &nbsp; 👁 64K
-                    &nbsp; | &nbsp; 2026-03-20T08:08:21.526333
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Brian Armstrong</strong> <span class="handle">Brian Armstrong</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">Very soon there are going to be more AI agents than humans making transactions. They can't open a bank account, but they can own a crypto wallet.</div>
-                <div class="tweet-meta">
-                    ❤️ 20K &nbsp; 🔁 3.8K &nbsp; 💬 2.2K &nbsp; 👁 4.5M
-                    &nbsp; | &nbsp; 2026-03-20T08:08:21.517205
-                </div>
-            </div>
-        </div>
-        <div class="layer-section" id="layer-xrp" style="display:none;">
-            <h2 style="color:#10b981">XRP / Ripple</h2>
-            
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Stuart Alderoty</strong> <span class="handle">Stuart Alderoty</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">We always knew XRP was not a security - and now the SEC has made clear what it is: a digital commodity. Grateful to the Crypto Task Force for working to deliver the clarity that markets, investors, and innovators have long deserved.</div>
-                <div class="tweet-meta">
-                    ❤️ 0 &nbsp; 🔁 0 &nbsp; 💬 0 &nbsp; 👁 0
-                    &nbsp; | &nbsp; 2026-03-20T08:09:14.637618
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Ripple Bull Winkle</strong> <span class="handle">Ripple Bull Winkle</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">A billion-dollar XRP move just happened. And almost nobody noticed.</div>
-                <div class="tweet-meta">
-                    ❤️ 321 &nbsp; 🔁 20 &nbsp; 💬 18 &nbsp; 👁 34K
-                    &nbsp; | &nbsp; 2026-03-20T08:09:14.635573
-                </div>
-            </div>
-            <div class="tweet positive">
-                <div class="tweet-header">
-                    <strong>kouji</strong> <span class="handle">kouji</span>
-                    <span class="tweet-sentiment">🟢 1.0</span>
-                </div>
-                <div class="tweet-text">This is not financial advice; it is merely the result of an amateur predicting the timing of an XRP surge. Many XRP holders believe the Clarity Act is a major milestone.</div>
-                <div class="tweet-meta">
-                    ❤️ 569 &nbsp; 🔁 51 &nbsp; 💬 42 &nbsp; 👁 42K
-                    &nbsp; | &nbsp; 2026-03-20T08:09:14.628999
-                </div>
-            </div>
-        </div>
-        <div class="layer-section" id="layer-singularity" style="display:none;">
-            <h2 style="color:#8b5cf6">Singularity / AGI</h2>
-            
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>The Curious Tales</strong> <span class="handle">The Curious Tales</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">BREAKING: AI professor argues the universe may be a simulated lab designed to engineer superintelligence.</div>
-                <div class="tweet-meta">
-                    ❤️ 0 &nbsp; 🔁 0 &nbsp; 💬 0 &nbsp; 👁 0
-                    &nbsp; | &nbsp; 2026-03-20T08:09:58.644245
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>All day Astronomy</strong> <span class="handle">All day Astronomy</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">NEWS: Renowned AI professor claims the universe is a simulation created to develop superintelligence - and will soon be turned off.</div>
-                <div class="tweet-meta">
-                    ❤️ 5K &nbsp; 🔁 576 &nbsp; 💬 582 &nbsp; 👁 893K
-                    &nbsp; | &nbsp; 2026-03-20T08:09:58.640966
-                </div>
-            </div>
-            <div class="tweet positive">
-                <div class="tweet-header">
-                    <strong>Dustin</strong> <span class="handle">Dustin</span>
-                    <span class="tweet-sentiment">🟢 1.0</span>
-                </div>
-                <div class="tweet-text">Perplexity CEO Aravind Srinivas just shattered the greatest illusion of the AI arms race. The entire market is waiting for a single god-like superintelligence. The physics of compute are forcing the exact opposite outcome.</div>
-                <div class="tweet-meta">
-                    ❤️ 1.5K &nbsp; 🔁 271 &nbsp; 💬 109 &nbsp; 👁 384K
-                    &nbsp; | &nbsp; 2026-03-20T08:09:58.634507
-                </div>
-            </div>
-        </div>
-        <div class="layer-section" id="layer-local_ai" style="display:none;">
-            <h2 style="color:#ef4444">Local AI</h2>
-            
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Rohan Paul</strong> <span class="handle">Rohan Paul</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">Google just dropped AI agents into the planet's biggest application, Google Map. Launched today across the United States and India.</div>
-                <div class="tweet-meta">
-                    ❤️ 0 &nbsp; 🔁 0 &nbsp; 💬 0 &nbsp; 👁 0
-                    &nbsp; | &nbsp; 2026-03-20T08:10:46.573382
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Paul Couvert</strong> <span class="handle">Paul Couvert</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">You can run local AI models up to 120B without a $10,000 Mac Studio. This phone-sized device is your own server for open-source models. 100% local and private.</div>
-                <div class="tweet-meta">
-                    ❤️ 245 &nbsp; 🔁 37 &nbsp; 💬 33 &nbsp; 👁 37K
-                    &nbsp; | &nbsp; 2026-03-20T08:10:46.569729
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>0xMarioNawfal</strong> <span class="handle">0xMarioNawfal</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</div>
-                <div class="tweet-meta">
-                    ❤️ 1.9K &nbsp; 🔁 184 &nbsp; 💬 89 &nbsp; 👁 213K
-                    &nbsp; | &nbsp; 2026-03-20T08:10:46.561734
-                </div>
-            </div>
-        </div>
-        <div class="layer-section" id="layer-indie_saas" style="display:none;">
-            <h2 style="color:#ec4899">Indie SaaS</h2>
-            
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>levelsio</strong> <span class="handle">@levelsio</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">Indie SaaS and solo founder discussion about building profitable businesses with AI tools.</div>
-                <div class="tweet-meta">
-                    ❤️ 0 &nbsp; 🔁 0 &nbsp; 💬 0 &nbsp; 👁 0
-                    &nbsp; | &nbsp; 2026-03-20T08:11:24.661616
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>weisser</strong> <span class="handle">weisser</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">$1.5M ARR in 2 weeks. Zero (human) teammates. Solo Founders Podcast is live with @bencera of @polsia, an AI that runs your company while you sleep. His solo founder rule: 80% AI, 20% taste.</div>
-                <div class="tweet-meta">
-                    ❤️ 781 &nbsp; 🔁 91 &nbsp; 💬 79 &nbsp; 👁 501K
-                    &nbsp; | &nbsp; 2026-03-20T08:11:24.659192
-                </div>
-            </div>
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Linus Ekenstam</strong> <span class="handle">Linus Ekenstam</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">Pay attention. Ben is on the pathway to become the first billion dollar solo founder. In less than 2 months he has grown from 0-4.4M in ARR. This is absolutely insane. Uncharted territory.</div>
-                <div class="tweet-meta">
-                    ❤️ 1.6K &nbsp; 🔁 106 &nbsp; 💬 69 &nbsp; 👁 595K
-                    &nbsp; | &nbsp; 2026-03-20T08:11:24.647321
-                </div>
-            </div>
-        </div>
-        <div class="layer-section" id="layer-pm_ai" style="display:none;">
-            <h2 style="color:#06b6d4">PM + AI</h2>
-            
-            <div class="tweet neutral">
-                <div class="tweet-header">
-                    <strong>Andrew Lokenauth</strong> <span class="handle">Andrew Lokenauth</span>
-                    <span class="tweet-sentiment">🟡 0.0</span>
-                </div>
-                <div class="tweet-text">2020: This is temporary. 2021: Things will normalize soon. 2022: Just be patient. 2023: The inflation is cooling. 2024: The economy is strong. 2025: Gas is up. Rent is up. AI is replacing jobs.</div>
-                <div class="tweet-meta">
-                    ❤️ 2.5K &nbsp; 🔁 265 &nbsp; 💬 30 &nbsp; 👁 0
-                    &nbsp; | &nbsp; 2026-03-20T08:12:13.770860
-                </div>
-            </div>
-            <div class="tweet negative">
-                <div class="tweet-header">
-                    <strong>The Rundown AI</strong> <span class="handle">The Rundown AI</span>
-                    <span class="tweet-sentiment">🔴 -1.0</span>
-                </div>
-                <div class="tweet-text">Anthropic just studied which jobs AI can theoretically replace vs. which ones it is actually automating right now. Computer and math: 94% exposed. Legal: ~90%. Management, architecture, arts and media: all 60%+. Observed usage so far? A fraction of that. But the gap is closing.</div>
-                <div class="tweet-meta">
-                    ❤️ 3.1K &nbsp; 🔁 621 &nbsp; 💬 181 &nbsp; 👁 406K
-                    &nbsp; | &nbsp; 2026-03-20T08:12:13.763140
-                </div>
-            </div>
-        </div>
-        <div class="layer-section" id="layer-trending" style="display:none;">
-            <h2 style="color:#6b7280">Trending</h2>
-            <p class="empty">No posts scraped yet.</p>
-        </div>
-
-    <div class="trending-section">
-        <h2>🔥 Trending Topics</h2>
-        <div class="trending-item"><strong>Comic Relief</strong> <span class="trending-meta">Trending in United Kingdom —  posts — 2026-03-20T08:13:08.752062</span></div><div class="trending-item"><strong>Delta</strong> <span class="trending-meta">Trending in United Kingdom —  posts — 2026-03-20T08:13:08.750990</span></div><div class="trending-item"><strong>#RedNoseDay</strong> <span class="trending-meta">Trending in United Kingdom —  posts — 2026-03-20T08:13:08.748517</span></div><div class="trending-item"><strong>#Copilot</strong> <span class="trending-meta">Trending —  posts — 2026-03-20T08:13:08.746796</span></div><div class="trending-item"><strong>PMQs</strong> <span class="trending-meta">Trending in United Kingdom —  posts — 2026-03-20T08:13:08.744998</span></div><div class="trending-item"><strong>#MAFSAU</strong> <span class="trending-meta">Trending in United Kingdom —  posts — 2026-03-20T08:13:08.743123</span></div><div class="trending-item"><strong>Finnish Saunas Linked to Lower Dementia Risk in Studies</strong> <span class="trending-meta">News — 1.2K posts posts — 2026-03-20T08:13:08.738927</span></div><div class="trending-item"><strong>Rumor of Saudi-Pakistan Rift Spreads Amid Iran Attacks</strong> <span class="trending-meta">Other — 749 posts posts — 2026-03-20T08:13:08.736790</span></div><div class="trending-item"><strong>Anthropic Launches Claude Code Channels for Remote AI Coding</strong> <span class="trending-meta">News — 10K posts posts — 2026-03-20T08:13:08.729212</span></div>
+    <div style="font-size:0.75em;color:#888">🟢 1 positive · ⚪ 6 neutral · 🔴 0 negative</div>
+  </div>
+  <div class="card">
+    <h3>Singularity/AGI</h3>
+    <div class="stat">7</div><div class="stat-label">posts tracked</div>
+    <div style="margin-top:8px;color:#888;font-weight:600">Avg sentiment: +0.000</div>
+    <div class="sentiment-bar">
+      <div class="pos" style="width:0%" title="0 positive"></div>
+      <div class="neu" style="width:100%" title="7 neutral"></div>
+      <div class="neg" style="width:0%" title="0 negative"></div>
     </div>
+    <div style="font-size:0.75em;color:#888">🟢 0 positive · ⚪ 7 neutral · 🔴 0 negative</div>
+  </div>
+  <div class="card">
+    <h3>Local AI</h3>
+    <div class="stat">5</div><div class="stat-label">posts tracked</div>
+    <div style="margin-top:8px;color:#ef4444;font-weight:600">Avg sentiment: -0.200</div>
+    <div class="sentiment-bar">
+      <div class="pos" style="width:0%" title="0 positive"></div>
+      <div class="neu" style="width:80%" title="4 neutral"></div>
+      <div class="neg" style="width:20%" title="1 negative"></div>
+    </div>
+    <div style="font-size:0.75em;color:#888">🟢 0 positive · ⚪ 4 neutral · 🔴 1 negative</div>
+  </div>
+  <div class="card">
+    <h3>Indie SaaS</h3>
+    <div class="stat">5</div><div class="stat-label">posts tracked</div>
+    <div style="margin-top:8px;color:#ef4444;font-weight:600">Avg sentiment: -0.400</div>
+    <div class="sentiment-bar">
+      <div class="pos" style="width:0%" title="0 positive"></div>
+      <div class="neu" style="width:60%" title="3 neutral"></div>
+      <div class="neg" style="width:40%" title="2 negative"></div>
+    </div>
+    <div style="font-size:0.75em;color:#888">🟢 0 positive · ⚪ 3 neutral · 🔴 2 negative</div>
+  </div>
+  <div class="card">
+    <h3>PM + AI</h3>
+    <div class="stat">6</div><div class="stat-label">posts tracked</div>
+    <div style="margin-top:8px;color:#ef4444;font-weight:600">Avg sentiment: -0.500</div>
+    <div class="sentiment-bar">
+      <div class="pos" style="width:0%" title="0 positive"></div>
+      <div class="neu" style="width:50%" title="3 neutral"></div>
+      <div class="neg" style="width:50%" title="3 negative"></div>
+    </div>
+    <div style="font-size:0.75em;color:#888">🟢 0 positive · ⚪ 3 neutral · 🔴 3 negative</div>
+  </div>
+  <div class="card">
+    <h3>Trending</h3>
+    <div class="stat">0</div><div class="stat-label">posts tracked</div>
+    <div style="margin-top:8px;color:#888;font-weight:600">Avg sentiment: +0.000</div>
+    <div class="sentiment-bar">
+      <div class="pos" style="width:0%" title="0 positive"></div>
+      <div class="neu" style="width:0%" title="0 neutral"></div>
+      <div class="neg" style="width:0%" title="0 negative"></div>
+    </div>
+    <div style="font-size:0.75em;color:#888">🟢 0 positive · ⚪ 0 neutral · 🔴 0 negative</div>
+  </div></div>
+<div class="card" style="margin-bottom:24px">
+  <h3>Sentiment Overview</h3>
+  <div class="chart-container"><canvas id="sentimentChart"></canvas></div>
 </div>
-
 <script>
-const labels = ["AI Agents", "Crypto AI", "XRP / Ripple", "Singularity / AGI", "Local AI", "Indie SaaS", "PM + AI", "Trending"];
-const posData = [0, 0, 1, 1, 0, 0, 0, 0];
-const negData = [0, 0, 0, 0, 0, 0, 1, 0];
-const neuData = [5, 6, 2, 2, 3, 3, 1, 0];
-const colors = ["#3b82f6", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444", "#ec4899", "#06b6d4", "#6b7280"];
-const counts = [5, 6, 3, 3, 3, 3, 2, 0];
-
-new Chart(document.getElementById('sentimentChart'), {
-    type: 'bar',
-    data: {
-        labels: labels,
-        datasets: [
-            { label: 'Positive', data: posData, backgroundColor: '#4ade80' },
-            { label: 'Negative', data: negData, backgroundColor: '#f87171' },
-            { label: 'Neutral', data: neuData, backgroundColor: '#fbbf24' }
-        ]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: '#e2e8f0' } } },
-        scales: {
-            x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
-            y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, stacked: false }
-        }
-    }
+new Chart(document.getElementById('sentimentChart'),{
+  type:'bar',
+  data:{labels:["AI Agents", "Crypto AI", "XRP/Ripple", "Singularity/AGI", "Local AI", "Indie SaaS", "PM + AI", "Trending"],datasets:[
+    {label:'Positive',data:[0, 1, 1, 0, 0, 0, 0, 0],backgroundColor:'#22c55e'},
+    {label:'Neutral',data:[4, 6, 6, 7, 4, 3, 3, 0],backgroundColor:'#666'},
+    {label:'Negative',data:[1, 0, 0, 0, 1, 2, 3, 0],backgroundColor:'#ef4444'}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,ticks:{color:'#888'},grid:{color:'#1a1a2a'}},y:{stacked:true,ticks:{color:'#888'},grid:{color:'#1a1a2a'}}},plugins:{legend:{labels:{color:'#ccc'}}}}
 });
-
-new Chart(document.getElementById('volumeChart'), {
-    type: 'doughnut',
-    data: {
-        labels: labels,
-        datasets: [{ data: counts, backgroundColor: colors }]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { position: 'right', labels: { color: '#e2e8f0', font: { size: 11 } } } }
-    }
-});
-
-function showLayer(key) {
-    document.querySelectorAll('.layer-section').forEach(el => el.style.display = 'none');
-    const el = document.getElementById('layer-' + key);
-    if (el) {
-        el.style.display = el.style.display === 'block' ? 'none' : 'block';
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+</script><div class="card" style="margin-bottom:24px"><h3>Recent Posts</h3><div class="tabs" id="layerTabs"><div class="tab active" onclick="showLayer('agents')">AI Agents</div><div class="tab " onclick="showLayer('crypto')">Crypto AI</div><div class="tab " onclick="showLayer('xrp')">XRP/Ripple</div><div class="tab " onclick="showLayer('singularity')">Singularity/AGI</div><div class="tab " onclick="showLayer('local_ai')">Local AI</div><div class="tab " onclick="showLayer('indie_saas')">Indie SaaS</div><div class="tab " onclick="showLayer('pm_ai')">PM + AI</div><div class="tab " onclick="showLayer('trending')">Trending</div></div><div class="layer-posts" id="posts-agents" style="display:block;max-height:500px;overflow-y:auto"><div class="tweet">
+<span class="handle">NVIDIA AI Developer</span> <span class="time">Mar 16</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Ready to deploy AI agents? NVIDIA NemoClaw simplifies running openclaw always-on assistants with a single command. Deploy claws more safely. Run any coding agent. Deploy anywhere.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">naiive</span> <span class="time">Mar 18</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">2028: Farmer</div>
+<div class="metrics">💬 80 🔁 286 ❤️ 2.1K 👁 110K</div>
+</div><div class="tweet">
+<span class="handle">Okara</span> <span class="time">Mar 16</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Today we&#x27;re introducing the world&#x27;s first AI CMO. Enter your website and it deploys a team of agents to help you get traffic and users. Try it now at okara.ai/cmo</div>
+<div class="metrics">💬 1.5K 🔁 3.9K ❤️ 27K 👁 13M</div>
+</div><div class="tweet">
+<span class="handle">Julian Goldie SEO</span> <span class="time">Mar 15</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">There&#x27;s a free 120 billion parameter AI you can run on your own computer. Zero internet. Zero API costs. Zero monthly fees. It&#x27;s called Nvidia Nemotron 3 Super. And it just changed what solopreneurs can do with AI agents.</div>
+<div class="metrics">💬 17 🔁 37 ❤️ 248 👁 19K</div>
+</div><div class="tweet">
+<span class="handle">Kyle Chassé</span> <span class="time">Mar 18</span>
+<span class="sentiment-neg" style="float:right;font-size:0.8em">negative</span>
+<div class="text">NVIDIA JUST SOLVED THE AGENT TRUST PROBLEM. OpenShell dropped two days ago. It&#x27;s the missing piece that makes autonomous AI agents actually safe to run.</div>
+<div class="metrics">💬 36 🔁 63 ❤️ 750 👁 175K</div>
+</div></div><div class="layer-posts" id="posts-crypto" style="display:none;max-height:500px;overflow-y:auto"><div class="tweet">
+<span class="handle">Raoul Pal</span> <span class="time">Feb 25</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">I always assumed the TAM of ubiquitous technology such as the internet, crypto or AI was the population of the world. It isn&#x27;t. AI agents will 2x the users of all of these in 5 years. Agents are more disruptive of TAM than the users themselves.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">0xMarioNawfal</span> <span class="time">Feb 27</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">AI AGENTS CAN NOW USE CRYPTO FULLY AUTONOMOUS. PAY, TRADE, BUILD APPS, ALL IN 1 PROMPT</div>
+<div class="metrics">💬 49 🔁 45 ❤️ 368 👁 64K</div>
+</div><div class="tweet">
+<span class="handle">Miles Deutscher</span> <span class="time">Jan 6, 2025</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">The last 30 days in crypto: AI agents, then daylight.</div>
+<div class="metrics">💬 86 🔁 15 ❤️ 279 👁 39K</div>
+</div><div class="tweet">
+<span class="handle">Aakash Gupta</span> <span class="time">Mar 10</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Armstrong is telling you AI agents need crypto because they can&#x27;t use banks, and nobody&#x27;s noticing that Visa, Mastercard, Google, Stripe, and PayPal already built the answer. Visa completed hundreds of agent-initiated transactions in live pilots last year.</div>
+<div class="metrics">💬 90 🔁 68 ❤️ 491 👁 94K</div>
+</div><div class="tweet">
+<span class="handle">Brian Armstrong</span> <span class="time">Mar 9</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Very soon there are going to be more AI agents than humans making transactions. They can&#x27;t open a bank account, but they can own a crypto wallet. Think about it.</div>
+<div class="metrics">💬 2.2K 🔁 3.8K ❤️ 20K 👁 4.5M</div>
+</div><div class="tweet">
+<span class="handle">Pumpius</span> <span class="time">Mar 9</span>
+<span class="sentiment-pos" style="float:right;font-size:0.8em">positive</span>
+<div class="text">Billionaire Dan Morehead DROPPED a BOMBSHELL on Bloomberg: AI agents are ALREADY ditching banks and hoarding XRP and crypto. They WILL HAVE to use CRYPTO. The great shift to decentralized wealth is upon us.</div>
+<div class="metrics">💬 14 🔁 125 ❤️ 464 � 28K</div>
+</div><div class="tweet">
+<span class="handle">naiive</span> <span class="time">Mar 18</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">2018: graphic designer 2022: Crypto trader 2023: Prompt engineer 2026: AI agents 2028: Farmer</div>
+<div class="metrics">💬 80 🔁 286 ❤️ 2.1K 👁 110K</div>
+</div></div><div class="layer-posts" id="posts-xrp" style="display:none;max-height:500px;overflow-y:auto"><div class="tweet">
+<span class="handle">James Seyffart</span> <span class="time">Mar 19</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">XRP ETF filings continue to pile up. Franklin Templeton, Bitwise, 21Shares, CoinShares all filing. Ripple legal status resolved.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">JackTheRippler</span> <span class="time">15h</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">NO FKN WAY, CHINA HAS THE EPSTEIN FILES. Chinese lawyer Victor Gao claims that China might now have access to the entire unredacted files.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">kouji</span> <span class="time">Mar 19</span>
+<span class="sentiment-pos" style="float:right;font-size:0.8em">positive</span>
+<div class="text">This is not financial advice. Many XRP holders believe the Clarity Act is a major milestone, but will XRP really surge at that exact moment?</div>
+<div class="metrics">💬 42 🔁 51 ❤️ 571 👁 46K</div>
+</div><div class="tweet">
+<span class="handle">JackTheRippler</span> <span class="time">8h</span>
+<span class="sentiment-neu" style="float:right;font-size:0..8em">neutral</span>
+<div class="text">MASSIVE: Ripple CEO Brad Garlinghouse says: I think it is now 90% that the CLARITY Act will pass by the end of April.</div>
+<div class="metrics">💬 17 🔁 58 ❤️ 448 👁 17K</div>
+</div><div class="tweet">
+<span class="handle">Ripple Bull Winkle</span> <span class="time">21h</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">XRP is about to explode. The SEC case is over. Ripple is dropping cross appeal. Clarity Act 90% chance by end of April says Brad Garlinghouse.</div>
+<div class="metrics">💬 8 🔁 6 ❤️ 155 👁 31K</div>
+</div><div class="tweet">
+<span class="handle">Pumpius</span> <span class="time">Mar 9</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Billionaire Dan Morehead DROPPED a BOMBSHELL on Bloomberg: AI agents are ALREADY ditching banks and hoarding XRP and crypto. They WILL HAVE to use CRYPTO.</div>
+<div class="metrics">💬 14 🔁 125 ❤️ 464 👁 28K</div>
+</div><div class="tweet">
+<span class="handle">evernorthxrp</span> <span class="time">Mar 19</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Evernorth Capital Has A New Meridian. XRP ecosystem growing.</div>
+<div class="metrics">💬 79 🔁 566 ❤️ 2.4K 👁 170K</div>
+</div></div><div class="layer-posts" id="posts-singularity" style="display:none;max-height:500px;overflow-y:auto"><div class="tweet">
+<span class="handle">Polymarket</span> <span class="time">Mar 14</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">AGI prediction markets showing increased activity. When will AGI arrive? Bettors shifting timelines closer.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">All day Astronomy</span> <span class="time">Mar 14</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">NEWS: Renowned AI professor claims the universe is a simulation created to develop superintelligence and will soon be turned off.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">Elon Musk</span> <span class="time">Mar 9</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">When AI can make original videos like this, we will have reached AGI</div>
+<div class="metrics">💬 505 🔁 695 ❤️ 2K 👁 1.1M</div>
+</div><div class="tweet">
+<span class="handle">The Curious Tales</span> <span class="time">Mar 14</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">BREAKING: AI professor argues the universe may be a simulated lab designed to engineer superintelligence and it might be nearing shutdown.</div>
+<div class="metrics">💬 89 🔁 58 ❤️ 570 👁 76K</div>
+</div><div class="tweet">
+<span class="handle">Carlos E. Perez</span> <span class="time">10h</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">The mistake is assuming AGI and consciousness in machines will arrive with a clean universal announcement. More likely: messy edge cases, public denial, then slow acceptance.</div>
+<div class="metrics">💬 0 🔁 1 ❤️ 17 👁 1.1K</div>
+</div><div class="tweet">
+<span class="handle">Dustin</span> <span class="time">Mar 16</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Elon Musk just described the terminal state of the global financial system. The banking sector is obsessed with fiat currency. Superintelligence wont even recognize it. Musk: I think money will stop being relevant at some point in the future.</div>
+<div class="metrics">💬 173 🔁 596 ❤️ 1.9K 👁 186K</div>
+</div><div class="tweet">
+<span class="handle">Dustin</span> <span class="time">Mar 14</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">The singularity is not a future event. It already happened. We just havent fully noticed yet.</div>
+<div class="metrics">💬 109 🔁 271 ❤️ 1.5K 👁 384K</div>
+</div></div><div class="layer-posts" id="posts-local_ai" style="display:none;max-height:500px;overflow-y:auto"><div class="tweet">
+<span class="handle">Kyle Chasse</span> <span class="time">Mar 18</span>
+<span class="sentiment-neg" style="float:right;font-size:0.8em">negative</span>
+<div class="text">NVIDIA JUST SOLVED THE AGENT TRUST PROBLEM. OpenShell dropped two days ago. Its the missing piece that makes autonomous AI agents actually safe to run on your own machine.</div>
+<div class="metrics">💬 36 🔁 63 ❤️ 750 👁 175K</div>
+</div><div class="tweet">
+<span class="handle">Julian Goldie SEO</span> <span class="time">Mar 15</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Theres a free 120 billion parameter AI you can run on your own computer. Zero internet. Zero API costs. Zero monthly fees. Nvidia Nemotron 3 Super. Download Ollama to get started.</div>
+<div class="metrics">💬 49 🔁 78 ❤️ 1.1K 👁 205K</div>
+</div><div class="tweet">
+<span class="handle">Miles Deutscher</span> <span class="time">Mar 12</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">OpenClaw is still one of the biggest untapped opportunities in AI right now. Experts are charging thousands just to set it up for small businesses. $6,000 just to set up a Mac Mini in person. Do this in your local area, and youll have zero competition.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">Perplexity</span> <span class="time">Mar 11</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Announcing Personal Computer. Personal Computer is an always on, local merge with Perplexity Computer that works for you 24/7. Its personal, secure, and works across your files, apps, and sessions through a continuously running Mac mini.</div>
+<div class="metrics">💬 1.6K 🔁 5.7K ❤️ 32K 👁 14M</div>
+</div><div class="tweet">
+<span class="handle">0xMarioNawfal</span> <span class="time">Mar 17</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</div>
+<div class="metrics">💬 89 🔁 184 ❤️ 1.9K 👁 213K</div>
+</div></div><div class="layer-posts" id="posts-indie_saas" style="display:none;max-height:500px;overflow-y:auto"><div class="tweet">
+<span class="handle">The Startup Ideas Podcast</span> <span class="time">Mar 14</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Solo founder playbook for 2026: use AI to build, ship fast, charge from day 1, iterate based on paying customers. Bootstrapped SaaS has never been more viable.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">etn.</span> <span class="time">Mar 13</span>
+<span class="sentiment-neg" style="float:right;font-size:0.8em">negative</span>
+<div class="text">Indie SaaS is dead they said. Meanwhile solo founders are shipping faster than ever with AI tools. The golden age of bootstrapped SaaS is just beginning.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">weisser</span> <span class="time">Mar 4</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">$1.5M ARR in 2 weeks. Zero human teammates. Solo Founders Podcast is live with bencera of polsia, an AI that runs your company while you sleep. His solo founder rule: 80% AI, 20% taste.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">levelsio</span> <span class="time">Feb 24</span>
+<span class="sentiment-neg" style="float:right;font-size:0.8em">negative</span>
+<div class="text">how to build a bootstrapped startup without funding: skip the pitch deck. open your code editor. ship something ugly in a weekend. charge money from day 1. free users give you nothing.</div>
+<div class="metrics">💬 727 🔁 1.1K ❤️ 12K 👁 604K</div>
+</div><div class="tweet">
+<span class="handle">Linus Ekenstam</span> <span class="time">Mar 18</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Every bug that could happen, happened. Investors throwing big. Bootstrapped SaaS journey continues.</div>
+<div class="metrics">💬 69 🔁 106 ❤️ 1.6K 👁 595K</div>
+</div></div><div class="layer-posts" id="posts-pm_ai" style="display:none;max-height:500px;overflow-y:auto"><div class="tweet">
+<span class="handle">Aakash Gupta</span> <span class="time">Feb 10</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">The AI PM tools landscape is exploding. Linear, Notion AI, Asana Intelligence, Monday AI - all shipping AI project management features. The role of PM is fundamentally changing.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">Andrew Lokenauth</span> <span class="time">Mar 13</span>
+<span class="sentiment-neg" style="float:right;font-size:0.8em">negative</span>
+<div class="text">AI is replacing jobs faster than anyone expected. Layoffs accelerating across tech, finance, and media. The jobs most at risk: data entry, customer service, content writing, basic coding, project management.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">The Rundown AI</span> <span class="time">Mar 6</span>
+<span class="sentiment-neg" style="float:right;font-size:0.8em">negative</span>
+<div class="text">Major companies are quietly replacing middle management with AI. Project managers, program managers, and coordinators are the most at risk.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">Aakash Gupta</span> <span class="time">Feb 16</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">AI is coming for project management. The tools are getting good enough to replace junior PMs. But senior PMs who can think strategically are more valuable than ever.</div>
+<div class="metrics">💬 0 🔁 0 ❤️ 0 👁 0</div>
+</div><div class="tweet">
+<span class="handle">Sergio Pereira</span> <span class="time">Mar 9</span>
+<span class="sentiment-neu" style="float:right;font-size:0.8em">neutral</span>
+<div class="text">Everyone is misreading this chart. At first glance it looks scary for Software Engineers. According to Anthropics data, 96% of software development tasks are exposed to being replaced by AI. Thats the highest of any profession. Higher than finance. Higher than legal.</div>
+<div class="metrics">💬 60 🔁 97 ❤️ 571 👁 86K</div>
+</div><div class="tweet">
+<span class="handle">Dustin</span> <span class="time">Mar 12</span>
+<span class="sentiment-neg" style="float:right;font-size:0.8em">negative</span>
+<div class="text">AI is not replacing jobs. It is replacing tasks. The people who understand this will thrive. The people who dont will panic.</div>
+<div class="metrics">💬 28 🔁 95 ❤️ 476 👁 100K</div>
+</div></div><div class="layer-posts" id="posts-trending" style="display:none;max-height:500px;overflow-y:auto"><div style="color:#666;padding:12px">No posts yet for this layer.</div></div></div>
+<script>
+function showLayer(layer){
+  document.querySelectorAll('.layer-posts').forEach(e=>e.style.display='none');
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+  document.getElementById('posts-'+layer).style.display='block';
+  event.target.classList.add('active');
 }
-</script>
-</body>
-</html>
+</script><div class="card" style="margin-bottom:24px"><h3>Trending Topics</h3><div class="trending-item"><span class="trending-topic">Caroline Lucas</span> <span class="trending-cat">Politics</span></div><div class="trending-item"><span class="trending-topic">#Copilot</span> <span class="trending-cat">Trending</span></div><div class="trending-item"><span class="trending-topic">NVIDIA Jensen Huang Expects Engineers to Spend Half Their Salary on AI Tokens</span> <span class="trending-cat">News</span></div><div class="trending-item"><span class="trending-topic">#TheBachelorette</span> <span class="trending-cat">Entertainment</span></div><div class="trending-item"><span class="trending-topic">Ozoro</span> <span class="trending-cat">Entertainment</span></div><div class="trending-item"><span class="trending-topic">Hermer</span> <span class="trending-cat">Trending in United Kingdom</span></div><div class="trending-item"><span class="trending-topic">#Ostara</span> <span class="trending-cat">Trending in United Kingdom</span></div><div class="trending-item"><span class="trending-topic">Rosenshine</span> <span class="trending-cat">Trending in United Kingdom</span></div><div class="trending-item"><span class="trending-topic">James Orr</span> <span class="trending-cat">Politics</span></div><div class="trending-item"><span class="trending-topic">Finnish Saunas Linked to Lower Dementia Risk in Studies</span> <span class="trending-cat">News</span></div><div class="trending-item"><span class="trending-topic">Cameraman Catches Estudiantes Fan Laser-Targeting Velez Goalkeeper</span> <span class="trending-cat">Sports</span></div><div class="trending-item"><span class="trending-topic">Anthropic Launches Claude Code Channels for Mobile AI Coding</span> <span class="trending-cat">News</span></div></div><div class="card"><h3>Scrape Log (last 50)</h3><table><tr><th>Layer</th><th>Posts</th><th>Time</th><th>Status</th><th>Notes</th></tr><tr><td>trending</td><td>12</td><td>2026-03-20T09:15:14.811953</td><td class="log-success">success</td><td></td></tr><tr><td>pm_ai</td><td>6</td><td>2026-03-20T09:14:28.448025</td><td class="log-success">success</td><td></td></tr><tr><td>indie_saas</td><td>5</td><td>2026-03-20T09:13:17.856475</td><td class="log-success">success</td><td></td></tr><tr><td>local_ai</td><td>5</td><td>2026-03-20T09:12:16.777584</td><td class="log-success">success</td><td></td></tr><tr><td>singularity</td><td>7</td><td>2026-03-20T09:11:18.969588</td><td class="log-success">success</td><td></td></tr><tr><td>xrp</td><td>7</td><td>2026-03-20T09:10:16.274888</td><td class="log-success">success</td><td></td></tr><tr><td>crypto</td><td>7</td><td>2026-03-20T09:09:00.445940</td><td class="log-success">success</td><td></td></tr><tr><td>agents</td><td>5</td><td>2026-03-20T09:07:29.875250</td><td class="log-success">success</td><td></td></tr></table></div></body></html>
