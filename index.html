@@ -3,185 +3,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>X Sentiment Dashboard - AI & Crypto Tracker</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<title>X Sentiment Dashboard - AI & Tech Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
-.container{max-width:1400px;margin:0 auto;padding:20px}
-header{text-align:center;padding:30px 0;border-bottom:1px solid #1e293b;margin-bottom:30px}
-h1{font-size:2rem;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
-.subtitle{color:#94a3b8;font-size:0.9rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:30px}
-.stat-card{background:#1e293b;border-radius:12px;padding:20px;text-align:center;border:1px solid #334155}
-.stat-card h3{font-size:0.8rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.stat-card .number{font-size:1.8rem;font-weight:700}
-.stat-card .sentiment{font-size:0.85rem;margin-top:4px}
-.pos{color:#10b981}.neg{color:#ef4444}.neu{color:#94a3b8}
-.chart-container{background:#1e293b;border-radius:12px;padding:20px;margin-bottom:30px;border:1px solid #334155}
-.chart-container h2{font-size:1.1rem;margin-bottom:16px;color:#f1f5f9}
-.tweets-section{margin-bottom:30px}
-.tweets-section h2{font-size:1.1rem;margin-bottom:16px;color:#f1f5f9}
-.tweet{background:#1e293b;border-radius:10px;padding:16px;margin-bottom:10px;border:1px solid #334155}
-.tweet-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.tweet-handle{color:#3b82f6;font-weight:600;font-size:0.9rem}
-.tweet-layer{font-size:0.75rem;padding:2px 8px;border-radius:12px;background:#334155;color:#94a3b8}
-.tweet-text{font-size:0.9rem;line-height:1.5;color:#cbd5e1}
-.tweet-meta{display:flex;gap:12px;margin-top:8px;font-size:0.8rem;color:#64748b}
-.trending-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:30px}
-.trend-card{background:#1e293b;border-radius:10px;padding:14px;border:1px solid #334155}
-.trend-topic{font-weight:600;color:#f1f5f9;margin-bottom:4px}
-.trend-meta{font-size:0.8rem;color:#64748b}
-.filter-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;justify-content:center}
-.filter-btn{padding:6px 14px;border-radius:20px;border:1px solid #334155;background:#1e293b;color:#94a3b8;cursor:pointer;font-size:0.85rem;transition:all .2s}
-.filter-btn:hover,.filter-btn.active{background:#3b82f6;color:#fff;border-color:#3b82f6}
-canvas{max-height:350px}
-footer{text-align:center;padding:20px 0;color:#475569;font-size:0.8rem;border-top:1px solid #1e293b;margin-top:20px}
+.header{background:linear-gradient(135deg,#1e293b,#0f172a);border-bottom:1px solid #334155;padding:20px 32px;display:flex;justify-content:space-between;align-items:center}
+.header h1{font-size:1.5rem;background:linear-gradient(135deg,#6366f1,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header .meta{color:#94a3b8;font-size:0.85rem}
+.container{max-width:1400px;margin:0 auto;padding:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px}
+.card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;transition:transform 0.2s}
+.card:hover{transform:translateY(-2px);border-color:#6366f1}
+.card h3{font-size:0.9rem;color:#94a3b8;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.card .big{font-size:2rem;font-weight:700;margin-bottom:4px}
+.card .sub{font-size:0.8rem;color:#64748b}
+.sentiment-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin-top:8px}
+.sentiment-bar .pos{background:#10b981}.sentiment-bar .neu{background:#64748b}.sentiment-bar .neg{background:#ef4444}
+.chart-container{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;margin-bottom:24px}
+.chart-container h2{font-size:1.1rem;margin-bottom:16px}
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:6px 16px;border-radius:20px;background:#334155;color:#94a3b8;cursor:pointer;font-size:0.85rem;border:none}
+.tab.active{background:#6366f1;color:white}
+.posts-section{margin-bottom:24px}
+.posts-section h2{font-size:1.1rem;margin-bottom:16px}
+.post{background:#1e293b;border-radius:8px;padding:16px;border:1px solid #334155;margin-bottom:8px}
+.post .post-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.post .handle{color:#6366f1;font-weight:600;font-size:0.9rem}
+.post .author{color:#64748b;font-size:0.8rem}
+.post .text{font-size:0.9rem;line-height:1.5;margin-bottom:8px}
+.post .metrics{display:flex;gap:16px;color:#64748b;font-size:0.8rem}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:0.75rem;font-weight:600}
+.badge.positive{background:#10b98120;color:#10b981}
+.badge.negative{background:#ef444420;color:#ef4444}
+.badge.neutral{background:#64748b20;color:#64748b}
+.trending-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.trend-item{background:#1e293b;border-radius:8px;padding:12px 16px;border:1px solid #334155;font-size:0.9rem}
+.trend-item .cat{color:#64748b;font-size:0.75rem}
+canvas{max-height:300px}
 </style>
 </head>
 <body>
+<div class="header">
+<div><h1>X Sentiment Dashboard</h1><div class="meta">AI & Tech Topic Tracker</div></div>
+<div class="meta">Total posts: 56 | Last scrape: 2026-03-20 03:16:23</div>
+</div>
 <div class="container">
-<header>
-<h1>X Sentiment Dashboard</h1>
-<p class="subtitle">AI Agents · Crypto · XRP · Singularity · Local AI · Indie SaaS · PM+AI · Trending</p>
-<p class="subtitle" style="margin-top:6px">Last updated: 2026-03-20 00:16 UTC</p>
-</header>
-
-<div class="grid" id="stats-grid"></div>
-
+<div class="grid" id="statsGrid"></div>
 <div class="chart-container">
-<h2>Sentiment Over Time (72h)</h2>
-<canvas id="sentimentChart"></canvas>
+<h2>Sentiment Timeline</h2>
+<div class="tabs" id="chartTabs"></div>
+<canvas id="timelineChart"></canvas>
 </div>
-
 <div class="chart-container">
-<h2>Tweet Volume by Layer</h2>
-<canvas id="volumeChart"></canvas>
+<h2>Sentiment Distribution</h2>
+<canvas id="distChart"></canvas>
 </div>
-
-<h2 style="margin-bottom:12px">Trending Topics</h2>
-<div class="trending-grid" id="trending-grid"></div>
-
-<div class="tweets-section">
+<div class="posts-section">
 <h2>Recent Posts</h2>
-<div class="filter-bar" id="filter-bar"></div>
-<div id="tweets-list"></div>
+<div class="tabs" id="postTabs"></div>
+<div id="postsContainer"></div>
 </div>
-
-<footer>
-<p>Noel's X Sentiment Tracker &middot; Auto-scraped hourly &middot; Data stored in SQLite</p>
-</footer>
+<div class="posts-section">
+<h2>Trending Topics</h2>
+<div class="trending-list" id="trendingList"></div>
 </div>
-
+</div>
 <script>
-const statsData = {"agents": {"total": 5, "positive": 0, "negative": 0, "neutral": 5, "avg_score": 0.0, "label": "AI Agents", "color": "#3b82f6"}, "crypto": {"total": 6, "positive": 0, "negative": 0, "neutral": 6, "avg_score": 0.0, "label": "Crypto AI", "color": "#f59e0b"}, "indie_saas": {"total": 8, "positive": 0, "negative": 1, "neutral": 7, "avg_score": -0.125, "label": "Indie SaaS", "color": "#ec4899"}, "local_ai": {"total": 7, "positive": 0, "negative": 1, "neutral": 6, "avg_score": -0.143, "label": "Local AI", "color": "#ef4444"}, "pm_ai": {"total": 8, "positive": 0, "negative": 0, "neutral": 8, "avg_score": 0.0, "label": "PM + AI", "color": "#06b6d4"}, "singularity": {"total": 9, "positive": 1, "negative": 0, "neutral": 8, "avg_score": 0.111, "label": "Singularity / AGI", "color": "#8b5cf6"}, "xrp": {"total": 10, "positive": 1, "negative": 0, "neutral": 9, "avg_score": 0.1, "label": "XRP / Ripple", "color": "#10b981"}};
-const hourlyData = {"agents": [{"hour": "2026-03-20 00:00", "score": 0.0, "count": 5}], "crypto": [{"hour": "2026-03-20 00:00", "score": 0.0, "count": 6}], "indie_saas": [{"hour": "2026-03-20 00:00", "score": -0.125, "count": 8}], "local_ai": [{"hour": "2026-03-20 00:00", "score": -0.143, "count": 7}], "pm_ai": [{"hour": "2026-03-20 00:00", "score": 0.0, "count": 8}], "singularity": [{"hour": "2026-03-20 00:00", "score": 0.111, "count": 9}], "xrp": [{"hour": "2026-03-20 00:00", "score": 0.1, "count": 10}]};
-const recentData = [{"handle": "Peter Walker", "author": "Peter Walker", "text": "Anthropic should have just made it a bar chart. Theoretical AI coverage vs observed AI coverage of job tasks by occupational category. Computer and Math 96%, Business and Finance 94%, Office and Admin 94%, Management 92%.", "layer": "pm_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:15:45.678992"}, {"handle": "Syed Ijlal Hussain", "author": "Syed Ijlal Hussain", "text": "AI is not just replacing jobs. It is redefining what work means. The question is not whether AI will take your job but whether you will let it.", "layer": "pm_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:15:45.676992"}, {"handle": "Cynthia Ozumba", "author": "Cynthia Ozumba", "text": "6 High-Demand Skills You Can Learn in 5 Weeks or Less: 1. Customer Support Management 2. Executive Assistance 3. Project Coordination 4. CRM Management 5. Online Business Management 6. AI Workflow Assistance", "layer": "pm_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:15:45.674421"}, {"handle": "Sergio Pereira", "author": "Sergio Pereira", "text": "Everyone is misreading this chart. At first glance it looks scary for Software Engineers. According to Anthropic data, 96% of software development tasks are exposed to being replaced by AI. That is the highest of any profession. Higher than finance. Higher than legal.", "layer": "pm_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:15:45.669850"}, {"handle": "NZ", "author": "NZ", "text": "While everyone argues about AI replacing jobs, it is quietly transforming entire industries.", "layer": "pm_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:15:45.666821"}, {"handle": "Nav Toor", "author": "Nav Toor", "text": "replacing 15,000 jobs while hiring a handful of AI researchers tells you exactly where big tech thinks the value is shifting", "layer": "pm_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:15:45.664312"}, {"handle": "Cyril Gupta", "author": "Cyril Gupta", "text": "AI is not replacing jobs. It is replacing people who refuse to use AI.", "layer": "pm_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:15:45.661014"}, {"handle": "Andrew Lokenauth", "author": "Andrew Lokenauth", "text": "2020: This is temporary. 2021: Things will normalize soon. 2022: Just be patient. 2023: The inflation is cooling. 2024: The economy is strong. 2025: Gas is up. Rent is up. Groceries are up. Unemployment is rising. War is escalating. AI is replacing jobs.", "layer": "pm_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:15:45.653461"}, {"handle": "weisser", "author": "weisser", "text": "500 rejections. 0 co-founders. $300M valuation. Solo Founders Podcast Episode 2 is live with @pk_iv of @browserbase. Paul tried to find a co-founder. Nobody took the role. So he started Browserbase alone. Now raised $67.5M with customers like Perplexity and Vercel.", "layer": "indie_saas", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:14:23.350390"}, {"handle": "Tibo", "author": "Tibo", "text": "unpopular take: the SaaSpocalypse is the best thing to happen to bootstrapped founders. everyone panicking about AI killing SaaS is missing the point.", "layer": "indie_saas", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:14:23.348564"}, {"handle": "Austin Walker", "author": "Austin Walker", "text": "being a solo founder is harder than i thought. i am looking for a co-founder. the best companies are built out of deep collaboration and shared ownership. i have built the foundation. raised plenty of capital. now i want someone in the trenches with me.", "layer": "indie_saas", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:14:23.346702"}, {"handle": "Starter Story", "author": "Starter Story", "text": "This micro-saas went from 0 to $1M ARR in 2 years. 1 founder, 0 employees, built MVP with bubble no-code, made $50K in first 5 months, 100% bootstrapped", "layer": "indie_saas", "sentiment": "negative", "score": -1.0, "scraped": "2026-03-20T00:14:23.343075"}, {"handle": "Ben Cera", "author": "Ben Cera", "text": "About to hit $4.5M run rate. Still 1 founder + AI. Zero employees. Honest moment: this past week almost broke me. No one prepares you for what PMF actually feels like.", "layer": "indie_saas", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:14:23.338198"}, {"handle": "Linus Ekenstam", "author": "Linus Ekenstam", "text": "Pay attention. Ben is on the pathway to become the first billion dollar solo founder. In less than 2 months he has grown from 0-4.4M in ARR. This is absolutely insane. Unchartered territory. Unreal.", "layer": "indie_saas", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:14:23.335330"}, {"handle": "@levelsio", "author": "@levelsio", "text": "how to build a bootstrapped startup without funding: 1. pick a problem you personally have. if you don't use your own product daily, quit now 2. skip the pitch deck. open your code editor. ship something ugly in a weekend 3. charge money from day 1. free users give you nothing", "layer": "indie_saas", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:14:23.332919"}, {"handle": "weisser", "author": "weisser", "text": "$1.5M ARR in 2 weeks. Zero human teammates. Solo Founders Podcast is live with @bencera of @polsia, an AI that runs your company while you sleep. His solo founder rule: 80% AI, 20% taste.", "layer": "indie_saas", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:14:23.326571"}, {"handle": "Ballaz", "author": "Ballaz", "text": "Local AI running on your own hardware is getting insanely good. The gap between cloud and on-device is closing fast.", "layer": "local_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:13:05.961179"}, {"handle": "Miles Deutscher", "author": "Miles Deutscher", "text": "15 vetted ideas for AI businesses. White-label AI chatbots for local businesses - build once, reskin, charge $300-1K/month per client. AI sales outreach - personalized cold email and DMs", "layer": "local_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:13:05.956197"}, {"handle": "Paul Couvert", "author": "Paul Couvert", "text": "You can run local AI models up to 120B without a $10,000 Mac Studio. This phone-sized device is your own server for open-source models. 100% local and private. Power an agent like OpenClaw 24/7, replace a chatbot.", "layer": "local_ai", "sentiment": "negative", "score": -1.0, "scraped": "2026-03-20T00:13:05.953421"}, {"handle": "NOVA", "author": "NOVA", "text": "My OpenClaw bot runs 6 AI agents 24/7 - and I am giving away the exact skill file for free: Scouts local businesses without a website, Audits their web presence, Builds a custom demo site + walkthrough video automatically, Sends cold outreach", "layer": "local_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:13:05.950890"}, {"handle": "Perplexity", "author": "Perplexity", "text": "Announcing Personal Computer. Personal Computer is an always on, local merge with Perplexity Computer that runs on your machine.", "layer": "local_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:13:05.948635"}, {"handle": "Rohan Paul", "author": "Rohan Paul", "text": "Google just dropped AI agents into the planet's biggest application, Google Map. Launched today across the US and India. This positions an AI model as the primary gatekeeper between everyday consumers and the local economy.", "layer": "local_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:13:05.946077"}, {"handle": "0xMarioNawfal", "author": "0xMarioNawfal", "text": "NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.", "layer": "local_ai", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:13:05.938152"}, {"handle": "Tsarathustra", "author": "Tsarathustra", "text": "It honestly blows my mind how many people cannot seem to grasp the implications of the singularity. We are living through the most transformative moment in human history.", "layer": "singularity", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:11:52.678149"}, {"handle": "Demis Hassabis", "author": "Demis Hassabis", "text": "Ten years ago, AlphaGo legendary match in Seoul heralded the start of the modern era in AI. Its famous Move 37 signaled to us that AI techniques were ready to tackle real-world problems in areas like science.", "layer": "singularity", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:11:52.675796"}, {"handle": "Elon Musk", "author": "Elon Musk", "text": "When AI can make original videos like this, we will have reached AGI", "layer": "singularity", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:11:52.673800"}, {"handle": "Brian Roemmele", "author": "Brian Roemmele", "text": "People ask me if I am worried about AGI and Robots. If I was the worrying kind it would be massive AI agent simulations with quantum computer assistance. It is no longer a theory we just deployed it. These agent simulations can decode things like an AI mind X-ray.", "layer": "singularity", "sentiment": "positive", "score": 1.0, "scraped": "2026-03-20T00:11:52.671484"}, {"handle": "The Curious Tales", "author": "The Curious Tales", "text": "BREAKING: AI professor argues the universe may be a simulated lab designed to engineer superintelligence and it might be nearing shutdown.", "layer": "singularity", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:11:52.668098"}, {"handle": "Polymarket", "author": "Polymarket", "text": "JUST IN: Renowned AI professor claims the universe is a simulation created to develop superintelligence and will soon be turned off.", "layer": "singularity", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:11:52.659669"}, {"handle": "Dustin", "author": "Dustin", "text": "Elon Musk just described the terminal state of the global financial system. The banking sector is obsessed with fiat currency. Superintelligence won't even recognize it.", "layer": "singularity", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:11:52.657193"}, {"handle": "All day Astronomy", "author": "All day Astronomy", "text": "NEWS: Renowned AI professor claims the universe is a simulation created to develop superintelligence and will soon be turned off.", "layer": "singularity", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:11:52.654027"}, {"handle": "Dustin", "author": "Dustin", "text": "Perplexity CEO Aravind Srinivas just shattered the greatest illusion of the AI arms race. The entire market is waiting for a single, god-like superintelligence to win the entire board. The physics of compute are forcing the exact opposite outcome. Models are not converging", "layer": "singularity", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:11:52.647862"}, {"handle": "Senator Bernie Moreno", "author": "Ripple Bull Winkle", "text": "Senator Bernie Moreno just issued a warning about XRP that almost nobody is pricing in. And the deadline is closer than people think.", "layer": "xrp", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:10:33.627774"}, {"handle": "Digital Asset Investor", "author": "Digital Asset Investor", "text": "Repricing XRP. Put another way pricing XRP at what it is actually worth. Lock In!", "layer": "xrp", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:10:33.625595"}, {"handle": "Ripple Bull Winkle", "author": "Ripple Bull Winkle", "text": "Most people think XRP is just sitting there. Waiting for regulation. Waiting for price action. But something already started. It didn't happen on charts. It happened inside filings, ownership structures, and capital flows.", "layer": "xrp", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:10:33.623974"}, {"handle": "Chad Steingraber", "author": "Chad Steingraber", "text": "Now we know why Elon won't talk about XRP.", "layer": "xrp", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:10:33.622233"}, {"handle": "Ripple", "author": "Ripple", "text": "Digital assets are moving from experimentation to real-world use. We see collaboration across the ecosystem as key to connecting onchain innovation with trusted global payments infrastructure. Initiatives like the Mastercard Crypto Partner Program help bring builders,", "layer": "xrp", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:10:33.620481"}, {"handle": "evernorthxrp", "author": "evernorthxrp", "text": "Read this before you react to the Fed today: XRP surpassed 7.7 million non-empty wallets for the first time in its 13-year history, with active addresses hitting a five-week peak of 46,767 on March 16. Tokenized commodities on XRP have grown from $111 million to $1.14 billion", "layer": "xrp", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:10:33.618430"}, {"handle": "David JoelKatz Schwartz", "author": "David JoelKatz Schwartz", "text": "Hey grok, can you explain to this person who created XRP and whether it is one of the most popular deflationary currencies in existence?", "layer": "xrp", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:10:33.615141"}, {"handle": "Stuart Alderoty", "author": "Stuart Alderoty", "text": "We always knew XRP was not a security - and now the SECGov has made clear what it is: a digital commodity. Grateful to the Crypto Task Force for working to deliver the clarity that markets, investors, and innovators have long deserved.", "layer": "xrp", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:10:33.612367"}, {"handle": "Ripple Bull Winkle", "author": "Ripple Bull Winkle", "text": "A billion-dollar XRP move just happened. And almost nobody noticed.", "layer": "xrp", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:10:33.609266"}, {"handle": "kouji", "author": "kouji", "text": "This is not financial advice; it is merely the result of an amateur predicting the timing of an XRP surge. Many XRP holders believe the Clarity Act is a major milestone, but will XRP really surge at that exact moment?", "layer": "xrp", "sentiment": "positive", "score": 1.0, "scraped": "2026-03-20T00:10:33.598516"}, {"handle": "Nikil Viswanathan", "author": "Nikil Viswanathan", "text": "The crypto x AI agent economy is about to get real. Banks are nobody noticing that Visa, Mastercard, Google, Stripe, and PayPal already built the answer. Visa completed hundreds of agent-initiated transactions in live pilots last year.", "layer": "crypto", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:08:48.184981"}, {"handle": "naiive", "author": "naiive", "text": "2018 : graphic designer 2022: Crypto trader 2023: Prompt engineer 2026: AI agents 2028: Farmer", "layer": "crypto", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:08:48.182568"}, {"handle": "Miles Deutscher", "author": "Miles Deutscher", "text": "New phrase to keep an eye on: DePAI. Will be one of the biggest trends in crypto over the coming 1-2 years. Stands for Decentralised Physical AI Infrastructure Stack: AI agents, On-chain robotics, Crowdsourced data, Incentivised compute", "layer": "crypto", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:08:48.176103"}, {"handle": "Diana", "author": "Diana", "text": "BREAKING: CZ Says AI Agents Will Make MILLION TIMES MORE PAYMENTS Than Humans Pushing Crypto Volume to $400 TRILLION/YEAR According to Binance CEO, the next explosion in crypto usage could come from AI agents making payments AUTOMATICALLY at machine", "layer": "crypto", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:08:48.172620"}, {"handle": "Brian Armstrong", "author": "Brian Armstrong", "text": "Very soon there are going to be more AI agents than humans making transactions. They can't open a bank account, but they can own a crypto wallet. Think about it.", "layer": "crypto", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:08:48.170111"}, {"handle": "0xMarioNawfal", "author": "0xMarioNawfal", "text": "AI AGENTS CAN NOW USE CRYPTO FULLY AUTONOMOUS PAY, TRADE, BUILD APPS, ALL IN 1 PROMPT", "layer": "crypto", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:08:48.155195"}, {"handle": "Ejaaz", "author": "Ejaaz", "text": "ai is getting weird again an app called Rent-a-Human lets ai agents hire humans to do tasks for them in the real world and stuff got out of hand", "layer": "agents", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:07:41.515373"}, {"handle": "Rohan Paul", "author": "Rohan Paul", "text": "Google just dropped AI agents into the planet's biggest application, Google Map. Launched today across the United States and India.", "layer": "agents", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:07:41.512899"}, {"handle": "Okara", "author": "Okara", "text": "Today we're introducing the world's first AI CMO. Enter your website and it deploys a team of agents to help you get traffic and users.", "layer": "agents", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:07:41.509132"}, {"handle": "0xMarioNawfal", "author": "0xMarioNawfal", "text": "NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.", "layer": "agents", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:07:41.506398"}, {"handle": "Kyle Chass\u00e9", "author": "Kyle Chass\u00e9", "text": "NVIDIA JUST SOLVED THE AGENT TRUST PROBLEM OpenShell dropped two days ago. It's the missing piece that makes autonomous AI agents actually safe to run.", "layer": "agents", "sentiment": "neutral", "score": 0.0, "scraped": "2026-03-20T00:07:41.497541"}];
-const trendingData = [{"topic": "Netanyahu Dispels Death Rumors Amid Iran Conflict Briefing", "category": "News", "count": "157.7K posts", "scraped": "2026-03-20T00:16:28.057850"}, {"topic": "Joe Kent Claims Probe into Charlie Kirk Assassination Was Halted", "category": "News", "count": "403K posts", "scraped": "2026-03-20T00:16:28.056130"}, {"topic": "Anthropic Launches Claude Code Channels for Mobile Messaging", "category": "News", "count": "1,906 posts", "scraped": "2026-03-20T00:16:28.054368"}, {"topic": "#911onABC", "category": "Only on X", "count": "", "scraped": "2026-03-20T00:16:28.052607"}, {"topic": "#showusyouknowus", "category": "Trending in United Kingdom", "count": "", "scraped": "2026-03-20T00:16:28.049249"}, {"topic": "#CyberSecurity", "category": "Trending", "count": "", "scraped": "2026-03-20T00:16:28.047283"}, {"topic": "Kepa", "category": "Sports", "count": "", "scraped": "2026-03-20T00:16:28.045046"}, {"topic": "#TheBachelorette", "category": "Entertainment", "count": "", "scraped": "2026-03-20T00:16:28.042931"}, {"topic": "#MaxiMadness", "category": "Trending", "count": "", "scraped": "2026-03-20T00:16:28.040761"}, {"topic": "Evernorth Files to Go Public as XRP Treasury via SPAC Merger", "category": "News", "count": "6.1K posts", "scraped": "2026-03-20T00:16:28.038085"}, {"topic": "Marc Andreessen Backs Independent AI Grid for Small Labs", "category": "News", "count": "82 posts", "scraped": "2026-03-20T00:16:28.034723"}, {"topic": "Netanyahu Dispels Death Rumors, Updates on U.S.-Israel Strikes Against Iran", "category": "Other", "count": "10K posts", "scraped": "2026-03-20T00:16:28.027251"}];
-const layerLabels = {"agents": "AI Agents", "crypto": "Crypto AI", "xrp": "XRP / Ripple", "singularity": "Singularity / AGI", "local_ai": "Local AI", "indie_saas": "Indie SaaS", "pm_ai": "PM + AI", "trending": "Trending"};
-const layerColors = {"agents": "#3b82f6", "crypto": "#f59e0b", "xrp": "#10b981", "singularity": "#8b5cf6", "local_ai": "#ef4444", "indie_saas": "#ec4899", "pm_ai": "#06b6d4", "trending": "#6b7280"};
+const stats={"agents": {"total": 7, "positive": 0, "negative": 2, "neutral": 5, "avg_score": -0.286, "recent": 7}, "crypto": {"total": 10, "positive": 3, "negative": 1, "neutral": 6, "avg_score": 0.2, "recent": 10}, "xrp": {"total": 12, "positive": 4, "negative": 1, "neutral": 7, "avg_score": 0.25, "recent": 12}, "singularity": {"total": 9, "positive": 1, "negative": 0, "neutral": 8, "avg_score": 0.111, "recent": 9}, "local_ai": {"total": 6, "positive": 0, "negative": 0, "neutral": 6, "avg_score": 0, "recent": 6}, "indie_saas": {"total": 6, "positive": 2, "negative": 1, "neutral": 3, "avg_score": 0.167, "recent": 6}, "pm_ai": {"total": 6, "positive": 0, "negative": 1, "neutral": 5, "avg_score": -0.167, "recent": 6}, "trending": {"total": 0, "positive": 0, "negative": 0, "neutral": 0, "avg_score": 0, "recent": 0}};
+const timeline={"agents": [{"hour": "2026-03-20 03:00", "score": -0.286, "count": 7}], "crypto": [{"hour": "2026-03-20 03:00", "score": 0.2, "count": 10}], "xrp": [{"hour": "2026-03-20 03:00", "score": 0.25, "count": 12}], "singularity": [{"hour": "2026-03-20 03:00", "score": 0.111, "count": 9}], "local_ai": [{"hour": "2026-03-20 03:00", "score": 0.0, "count": 6}], "indie_saas": [{"hour": "2026-03-20 03:00", "score": 0.167, "count": 6}], "pm_ai": [{"hour": "2026-03-20 03:00", "score": -0.167, "count": 6}], "trending": []};
+const topPosts={"agents": [{"handle": "Kyle Chass\u00e9", "author": "Kyle Chass\u00e9", "text": "NVIDIA JUST SOLVED THE AGENT TRUST PROBLEM OpenShell dropped two days ago. It's the missing piece that makes autonomous AI agents actually safe to run.", "likes": "746", "reposts": "63", "replies": "36", "views": "173K", "sentiment": "negative", "score": -1.0, "time": "2026-03-18T18:30:00.000Z"}, {"handle": "Ejaaz", "author": "Ejaaz", "text": "someone built tool that transports your AI agents into a video game. instead of tracking 10+ conversations you can just watch them in an office.", "likes": "760", "reposts": "37", "replies": "24", "views": "101K", "sentiment": "neutral", "score": 0.0, "time": "2026-02-23T20:01:20.000Z"}, {"handle": "0xMarioNawfal", "author": "0xMarioNawfal", "text": "NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.", "likes": "1.9K", "reposts": "183", "replies": "89", "views": "212K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-17T22:15:00.000Z"}, {"handle": "Ejaaz", "author": "Ejaaz", "text": "ai is getting weird again an app called Rent-a-Human lets ai agents hire humans to do tasks for them in the real world", "likes": "1.4K", "reposts": "277", "replies": "185", "views": "361K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-13T14:14:51.000Z"}, {"handle": "Shubham Saboo", "author": "Shubham Saboo", "text": "This is how you run a zero human AI Agent Company in 2026. OpenClaw, Cursor, and Codex agents organized under one org structure, pointed at one goal. 100% Opensource.", "likes": "1.8K", "reposts": "288", "replies": "99", "views": "238K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-18T02:38:18.000Z"}, {"handle": "Akshay", "author": "Akshay", "text": "RAG was never the end goal. Memory in AI agents is where everything is heading. Let me break down this evolution in the simplest way possible.", "likes": "810", "reposts": "148", "replies": "50", "views": "64K", "sentiment": "negative", "score": -1.0, "time": "2026-03-01T12:39:05.000Z"}, {"handle": "CG", "author": "CG", "text": "POV: vibecoders when they realise AI agents can write, debug and ship code for them 24/7", "likes": "988", "reposts": "48", "replies": "29", "views": "102K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-19T16:02:34.000Z"}], "crypto": [{"handle": "Aakash Gupta", "author": "Aakash Gupta", "text": "Armstrong is telling you AI agents need crypto because they cant use banks, and nobodys noticing that Visa, Mastercard, Google, Stripe, and PayPal already built the answer.", "likes": "491", "reposts": "68", "replies": "90", "views": "94K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-10T05:02:43.000Z"}, {"handle": "0xMarioNawfal", "author": "0xMarioNawfal", "text": "AI AGENTS CAN NOW USE CRYPTO FULLY AUTONOMOUS PAY, TRADE, BUILD APPS, ALL IN 1 PROMPT", "likes": "369", "reposts": "45", "replies": "49", "views": "64K", "sentiment": "neutral", "score": 0.0, "time": "2026-02-27T01:15:00.000Z"}, {"handle": "The Wolf Of All Streets", "author": "The Wolf Of All Streets", "text": "When Brian Armstrong posted that AI agents cant open bank accounts but can use crypto wallets and that there will soon be more AI agents making transactions than humans it stuck with me.", "likes": "1.9K", "reposts": "322", "replies": "300", "views": "212K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-11T21:36:34.000Z"}, {"handle": "slash1s", "author": "slash1s", "text": "me: 5 years grinding crypto, reading broken API docs at 3am. Chinese college kids MiroFish + ByteDance OpenViking + Context Hub AI agents own Stack Overflow by Andrew Ng. agents now fix their own", "likes": "187", "reposts": "11", "replies": "16", "views": "17K", "sentiment": "negative", "score": -1.0, "time": "2026-03-17T15:05:12.000Z"}, {"handle": "Miles Deutscher", "author": "Miles Deutscher", "text": "AI/Agents If youve been following me for a while youll know how vocal Ive been on AIs potential in crypto. We saw some promising use cases earlier this year but nothing has truly materialised yet.", "likes": "66", "reposts": "5", "replies": "10", "views": "22K", "sentiment": "positive", "score": 1.0, "time": "2025-10-28T17:30:16.000Z"}, {"handle": "Miles Deutscher", "author": "Miles Deutscher", "text": "Theres never been a better time to get involved with AI agents. If youre not using agents in 2026 youre falling behind. The amount of asymmetric opportunities they can spot for you is insane.", "likes": "102", "reposts": "15", "replies": "24", "views": "25K", "sentiment": "positive", "score": 1.0, "time": "2026-01-17T00:13:01.000Z"}, {"handle": "Graeme", "author": "Graeme", "text": "When Coinbase, Circle, Visa, Stripe, Google, and Cloudflare are all rushing into the same lane in crypto, it is probably worth paying attention. AI agents are one of the few truly evergreen use cases for crypto.", "likes": "82", "reposts": "12", "replies": "13", "views": "8.8K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-12T04:13:00.000Z"}, {"handle": "Jungle Inc Crypto News", "author": "Jungle Inc Crypto News", "text": "The Old Way of running a company is dead. Brian Armstrong just revealed how hes using AI agents to run Coinbase, and its a glimpse into the future of leadership.", "likes": "2.9K", "reposts": "320", "replies": "74", "views": "278K", "sentiment": "neutral", "score": 0.0, "time": "2026-01-24T20:59:00.000Z"}], "xrp": [{"handle": "Stuart Alderoty", "author": "Stuart Alderoty", "text": "We always knew XRP wasnt a security - and now the SEC has made clear what it is: a digital commodity. Grateful to the Crypto Task Force for working with us.", "likes": "6.9K", "reposts": "1.6K", "replies": "188", "views": "323K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-18T00:26:53.000Z"}, {"handle": "David JoelKatz Schwartz", "author": "David JoelKatz Schwartz", "text": "Hey grok, can you explain to this person who created XRP and whether its one of the most popular deflationary currencies in existence?", "likes": "102", "reposts": "8", "replies": "6", "views": "39K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-16T07:00:30.000Z"}, {"handle": "kouji", "author": "kouji", "text": "This is not financial advice. It is merely the result of an amateur like myself arbitrarily predicting the timing of an XRP surge. Many XRP holders believe the Clarity Act is a major milestone.", "likes": "564", "reposts": "51", "replies": "42", "views": "41K", "sentiment": "positive", "score": 1.0, "time": "2026-03-19T00:03:53.000Z"}, {"handle": "Ripple Bull Winkle", "author": "Ripple Bull Winkle", "text": "A billion-dollar XRP move just happened. And almost nobody noticed.", "likes": "282", "reposts": "15", "replies": "18", "views": "28K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-19T22:00:44.000Z"}, {"handle": "Flare", "author": "Flare", "text": "Sablecoins + payments are a huge focus for the blockchains future. Excited to see this conversation with Circle and XRPL Commons.", "likes": "36", "reposts": "2", "replies": "2", "views": "742", "sentiment": "positive", "score": 1.0, "time": "2026-03-19T16:01:27.000Z"}, {"handle": "Cobb", "author": "Cobb", "text": "Is this something to pay attention to or nothing burger?", "likes": "404", "reposts": "39", "replies": "43", "views": "75K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-18T00:56:23.000Z"}, {"handle": "Ripple", "author": "Ripple", "text": "Digital assets are moving from experimentation to real-world use. We see collaboration across the ecosystem as key to connecting onchain innovation with trusted global payments infrastructure.", "likes": "7.4K", "reposts": "2K", "replies": "221", "views": "0", "sentiment": "neutral", "score": 0.0, "time": "2026-03-11T15:30:58.000Z"}, {"handle": "evernorthxrp", "author": "evernorthxrp", "text": "Read this before you react to the Fed today: XRP surpassed 7.7 million non-empty wallets for the first time in its 13-year history, with active addresses surging.", "likes": "2.4K", "reposts": "562", "replies": "79", "views": "0", "sentiment": "positive", "score": 1.0, "time": "2026-03-18T20:05:34.000Z"}], "singularity": [{"handle": "Dustin", "author": "Dustin", "text": "Perplexity CEO Aravind Srinivas just shattered the greatest illusion of the AI arms race. The entire market is waiting for AGI breakthroughs.", "likes": "1.5K", "reposts": "271", "replies": "109", "views": "384K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-14T00:26:10.000Z"}, {"handle": "The Curious Tales", "author": "The Curious Tales", "text": "BREAKING: AI professor argues the universe may be a simulated lab designed to engineer superintelligence and it might be nearing shutdown.", "likes": "571", "reposts": "58", "replies": "89", "views": "0", "sentiment": "neutral", "score": 0.0, "time": "2026-03-14T03:48:01.000Z"}, {"handle": "Dustin", "author": "Dustin", "text": "Elon Musk just described the terminal state of the global financial system. The banking sector is obsessed with fiat currency. Superintelligence wont even recognize it.", "likes": "1.9K", "reposts": "597", "replies": "173", "views": "185K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-16T02:33:25.000Z"}, {"handle": "Polymarket", "author": "Polymarket", "text": "JUST IN: Renowned AI professor claims the universe is a simulation created to develop superintelligence and will soon be turned off.", "likes": "11K", "reposts": "2.1K", "replies": "1.8K", "views": "4.1M", "sentiment": "neutral", "score": 0.0, "time": "2026-03-14T00:41:00.000Z"}, {"handle": "All day Astronomy", "author": "All day Astronomy", "text": "NEWS: Renowned AI professor claims the universe is a simulation created to develop superintelligence and will soon be turned off.", "likes": "5K", "reposts": "576", "replies": "582", "views": "0", "sentiment": "neutral", "score": 0.0, "time": "2026-03-14T01:47:35.000Z"}, {"handle": "Brian Roemmele", "author": "Brian Roemmele", "text": "People ask me if I am worried about AGI and Robots. If I was the worrying kind it would be massive AI agent simulations.", "likes": "280", "reposts": "63", "replies": "28", "views": "0", "sentiment": "neutral", "score": 0.0, "time": "2026-03-17T04:24:41.000Z"}, {"handle": "Dustin", "author": "Dustin", "text": "Palantir CEO Alex Karp just delivered the brutal, unvarnished truth about the global AI arms race. The political class needs to wake up to AGI.", "likes": "291", "reposts": "89", "replies": "45", "views": "0", "sentiment": "neutral", "score": 0.0, "time": "2026-03-14T17:48:17.000Z"}, {"handle": "Haider.", "author": "Haider.", "text": "Sam Altman says another breakthrough beyond transformers could be coming, and models are now smart enough to help find it. AGI progress accelerating.", "likes": "1K", "reposts": "118", "replies": "163", "views": "0", "sentiment": "positive", "score": 1.0, "time": "2026-03-14T05:15:00.000Z"}], "local_ai": [{"handle": "0xMarioNawfal", "author": "0xMarioNawfal", "text": "NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.", "likes": "1.9K", "reposts": "183", "replies": "89", "views": "212K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-17T22:15:00.000Z"}, {"handle": "Perplexity", "author": "Perplexity", "text": "Announcing Personal Computer. Personal Computer is an always on, local merge with Perplexity Computer that works for you 24/7. Its personal, secure, and works across your files, apps, and sessions through a continuously running Mac mini.", "likes": "32K", "reposts": "5.7K", "replies": "1.6K", "views": "13M", "sentiment": "neutral", "score": 0.0, "time": "2026-03-11T17:51:42.000Z"}, {"handle": "Rohan Paul", "author": "Rohan Paul", "text": "Google just dropped AI agents into the planets biggest application, Google Maps. Launched today across 150+ countries. This fundamentally positions an AI model as the primary gatekeeper between everyday consumers and the local economy.", "likes": "281", "reposts": "64", "replies": "23", "views": "63K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-13T07:48:28.000Z"}, {"handle": "NOVA", "author": "NOVA", "text": "My OpenClaw bot runs 6 AI agents 24/7 - and Im giving away the exact skill file for free. Scouts local businesses without a website, audits their web presence.", "likes": "333", "reposts": "63", "replies": "368", "views": "34K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-19T12:16:12.000Z"}, {"handle": "Paul Couvert", "author": "Paul Couvert", "text": "You can run local AI models up to 120B without a $10,000 Mac Studio. This phone-sized device is your own server for open-source models. 100% local and private.", "likes": "244", "reposts": "37", "replies": "32", "views": "0", "sentiment": "neutral", "score": 0.0, "time": "2026-03-14T14:00:49.000Z"}, {"handle": "Manus", "author": "Manus", "text": "Today, were taking Manus out of the cloud and putting it on your desktop. Introducing My Computer, local AI that works across your files.", "likes": "0", "reposts": "0", "replies": "0", "views": "0", "sentiment": "neutral", "score": 0.0, "time": "2026-03-16T14:59:03.000Z"}], "indie_saas": [{"handle": "weisser", "author": "weisser", "text": "$1.5M ARR in 2 weeks. Zero human teammates. Solo Founders Podcast is live with Ben Cera.", "likes": "781", "reposts": "91", "replies": "79", "views": "501K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-04T00:22:16.000Z"}, {"handle": "Linus Ekenstam", "author": "Linus Ekenstam", "text": "Pay attention. Ben is on the pathway to become the first billion dollar solo founder. In less than 2 months he has grown from 0-4.4M in ARR. This is absolutely insane.", "likes": "1.6K", "reposts": "106", "replies": "69", "views": "594K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-18T09:18:47.000Z"}, {"handle": "@levelsio", "author": "@levelsio", "text": "how to build a bootstrapped startup without funding: 1. pick a problem you personally have. 2. skip the pitch deck. open your code editor. ship something ugly in a weekend. 3. charge money from day 1.", "likes": "12K", "reposts": "1.1K", "replies": "727", "views": "604K", "sentiment": "negative", "score": -1.0, "time": "2026-02-24T20:32:04.000Z"}, {"handle": "weisser", "author": "weisser", "text": "500 rejections. 0 co-founders. $300M valuation. Solo Founders Podcast Episode 2 is live with Paul of Browserbase.", "likes": "255", "reposts": "27", "replies": "26", "views": "55K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-11T17:59:22.000Z"}, {"handle": "Austin Walker", "author": "Austin Walker", "text": "being a solo founder is harder than i thought. im looking for a co-founder. the best companies are built out of deep collaboration and shared ownership.", "likes": "301", "reposts": "24", "replies": "89", "views": "0", "sentiment": "positive", "score": 1.0, "time": "2026-03-17T23:42:49.000Z"}, {"handle": "@levelsio", "author": "@levelsio", "text": "My friend thepatwalls just exited Starter Story, really happy for him. Most startups typically take bootstrapped approach and indie SaaS is thriving.", "likes": "0", "reposts": "0", "replies": "0", "views": "0", "sentiment": "positive", "score": 1.0, "time": "2026-02-23T15:24:00.000Z"}], "pm_ai": [{"handle": "Andrew Lokenauth", "author": "Andrew Lokenauth", "text": "2020: This is temporary. 2021: Things will normalize soon. 2022: Just be patient. 2023: The industry is changing. 2024: AI is replacing jobs. 2025: More layoffs. 2026: The new normal.", "likes": "2.5K", "reposts": "264", "replies": "30", "views": "161K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-13T21:35:11.000Z"}, {"handle": "Milk Road AI", "author": "Milk Road AI", "text": "Dario Amodei, CEO of Anthropic, laid out what he sees as the most DANGEROUS outcome of the AI revolution. Amodei said randomly replacing 50% of jobs with AI is the worst case scenario.", "likes": "27", "reposts": "6", "replies": "12", "views": "5.1K", "sentiment": "negative", "score": -1.0, "time": "2026-03-18T13:57:54.000Z"}, {"handle": "Dustin", "author": "Dustin", "text": "Bret Taylor, former co-CEO of Salesforce and chair of OpenAI, just redefined the unit of productivity. Its not a person. Its a process. AI wont replace a worker.", "likes": "476", "reposts": "95", "replies": "28", "views": "100K", "sentiment": "neutral", "score": 0.0, "time": "2026-03-12T12:03:01.000Z"}, {"handle": "Cyril Gupta", "author": "Cyril Gupta", "text": "AI isnt replacing jobs. Its replacing people who refuse to use AI.", "likes": "1", "reposts": "0", "replies": "0", "views": "34", "sentiment": "neutral", "score": 0.0, "time": "2026-03-16T04:13:54.000Z"}, {"handle": "Syed Ijlal Hussain", "author": "Syed Ijlal Hussain", "text": "AI is not primarily replacing jobs. It is reorganizing how work is structured. The real shift in the labor market is not displacement. It is augmentation becoming uneven across roles and functions.", "likes": "50", "reposts": "39", "replies": "5", "views": "0", "sentiment": "neutral", "score": 0.0, "time": "2026-03-13T18:05:51.000Z"}, {"handle": "Nav Toor", "author": "Nav Toor", "text": "replacing 15,000 jobs while hiring a handful of AI researchers tells you exactly where big tech thinks value creation is heading.", "likes": "0", "reposts": "0", "replies": "0", "views": "0", "sentiment": "neutral", "score": 0.0, "time": "2026-03-14T08:09:26.000Z"}], "trending": []};
+const trending=[{"topic": "AI Teaser for Titty Killer 5: Zero G Racks Up 1.6 Million Views", "category": "News", "count": "1.4K", "time": "2026-03-20 03:17:02"}, {"topic": "Netanyahu: Israel Struck Iran Gas Field Alone Amid Gulf Energy Clashes", "category": "News", "count": "4.5K", "time": "2026-03-20 03:17:02"}, {"topic": "Joe Kent Claims Probe into Charlie Kirk Assassination Was Halted", "category": "Other", "count": "423K", "time": "2026-03-20 03:17:02"}, {"topic": "Ubisoft", "category": "Gaming", "count": "", "time": "2026-03-20 03:17:02"}, {"topic": "Supergirl", "category": "Entertainment", "count": "", "time": "2026-03-20 03:17:02"}, {"topic": "#SLOMW", "category": "Entertainment", "count": "", "time": "2026-03-20 03:17:02"}, {"topic": "JOHN MCGINN", "category": "Sports", "count": "", "time": "2026-03-20 03:17:02"}, {"topic": "#TheBachelorette", "category": "Entertainment", "count": "", "time": "2026-03-20 03:17:02"}, {"topic": "Cavs", "category": "Sports", "count": "", "time": "2026-03-20 03:17:02"}, {"topic": "Trump and Netanyahu Claim Success in Joint Strikes on Iran", "category": "News", "count": "16.6K", "time": "2026-03-20 03:17:02"}];
+const LAYERS={"agents": {"label": "AI Agents", "color": "#6366f1"}, "crypto": {"label": "Crypto AI", "color": "#f59e0b"}, "xrp": {"label": "XRP/Ripple", "color": "#3b82f6"}, "singularity": {"label": "Singularity/AGI", "color": "#ef4444"}, "local_ai": {"label": "Local AI", "color": "#10b981"}, "indie_saas": {"label": "Indie SaaS", "color": "#8b5cf6"}, "pm_ai": {"label": "PM & AI Jobs", "color": "#ec4899"}, "trending": {"label": "Trending", "color": "#64748b"}};
 
 // Stats cards
-const sg = document.getElementById('stats-grid');
-Object.entries(statsData).forEach(([k,v]) => {
-    const sentClass = v.avg_score > 0.1 ? 'pos' : v.avg_score < -0.1 ? 'neg' : 'neu';
-    sg.innerHTML += `<div class="stat-card">
-        <h3 style="color:${v.color}">${v.label}</h3>
-        <div class="number">${v.total}</div>
-        <div class="sentiment ${sentClass}">Avg: ${v.avg_score?.toFixed(2) || '0.00'}</div>
-        <div style="font-size:0.75rem;color:#64748b;margin-top:4px">+${v.positive} / -${v.negative} / =${v.neutral}</div>
-    </div>`;
+const grid=document.getElementById('statsGrid');
+Object.entries(LAYERS).forEach(([key,cfg])=>{
+const s=stats[key]||{};
+const total=s.total||0;const pos=s.positive||0;const neg=s.negative||0;const neu=s.neutral||0;
+const pPct=total?Math.round(pos/total*100):0;
+const nPct=total?Math.round(neg/total*100):0;
+const neuPct=total?Math.round(neu/total*100):0;
+grid.innerHTML+=`<div class="card">
+<h3><span class="dot" style="background:${cfg.color}"></span>${cfg.label}</h3>
+<div class="big">${total}</div>
+<div class="sub">Avg score: ${(s.avg_score||0).toFixed(3)} | New: ${s.recent||0}</div>
+<div class="sentiment-bar"><div class="pos" style="width:${pPct}%"></div><div class="neu" style="width:${neuPct}%"></div><div class="neg" style="width:${nPct}%"></div></div>
+<div class="sub" style="margin-top:4px">+${pos} / ~${neu} / -${neg}</div>
+</div>`;
 });
 
-// Sentiment chart
-const ctx1 = document.getElementById('sentimentChart').getContext('2d');
-const datasets = Object.entries(hourlyData).map(([layer, points]) => ({
-    label: layerLabels[layer] || layer,
-    data: points.map(p => ({x: p.hour, y: p.score})),
-    borderColor: layerColors[layer] || '#6b7280',
-    backgroundColor: (layerColors[layer] || '#6b7280') + '20',
-    tension: 0.3,
-    pointRadius: 2,
-    borderWidth: 2
-}));
-new Chart(ctx1, {
-    type: 'line',
-    data: { datasets },
-    options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
-        scales: {
-            x: { ticks: { color: '#64748b', maxTicksLimit: 12 }, grid: { color: '#1e293b' } },
-            y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' }, min: -1, max: 1,
-                 title: { display: true, text: 'Sentiment', color: '#64748b' } }
-        }
-    }
+// Timeline chart
+let timelineChart;
+const chartTabs=document.getElementById('chartTabs');
+const keys=Object.keys(LAYERS);
+keys.forEach((k,i)=>{
+const btn=document.createElement('button');
+btn.className='tab'+(i===0?' active':'');
+btn.textContent=LAYERS[k].label;
+btn.onclick=()=>{
+document.querySelectorAll('#chartTabs .tab').forEach(t=>t.classList.remove('active'));
+btn.classList.add('active');
+updateTimeline(k);
+};
+chartTabs.appendChild(btn);
 });
 
-// Volume chart
-const ctx2 = document.getElementById('volumeChart').getContext('2d');
-const volLabels = Object.keys(statsData).map(k => layerLabels[k] || k);
-const volData = Object.values(statsData).map(v => v.total);
-const volColors = Object.keys(statsData).map(k => layerColors[k] || '#6b7280');
-new Chart(ctx2, {
-    type: 'bar',
-    data: {
-        labels: volLabels,
-        datasets: [{ data: volData, backgroundColor: volColors, borderRadius: 6 }]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
-            y: { ticks: { color: '#64748b' }, grid: { color: '#1e293b' } }
-        }
-    }
+function updateTimeline(layer){
+const data=timeline[layer]||[];
+if(timelineChart)timelineChart.destroy();
+timelineChart=new Chart(document.getElementById('timelineChart'),{
+type:'line',
+data:{labels:data.map(d=>d.hour),datasets:[
+{label:'Sentiment',data:data.map(d=>d.score),borderColor:LAYERS[layer].color,backgroundColor:LAYERS[layer].color+'20',fill:true,tension:0.3},
+{label:'Count',data:data.map(d=>d.count),borderColor:'#64748b',backgroundColor:'#64748b20',fill:false,tension:0.3,yAxisID:'y1'}
+]},
+options:{responsive:true,scales:{y:{grid:{color:'#334155'},ticks:{color:'#94a3b8'}},y1:{position:'right',grid:{display:false},ticks:{color:'#94a3b8'}},x:{grid:{color:'#334155'},ticks:{color:'#94a3b8',maxTicksLimit:12}}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}
 });
+}
+updateTimeline(keys[0]);
+
+// Distribution chart
+new Chart(document.getElementById('distChart'),{
+type:'bar',
+data:{labels:keys.map(k=>LAYERS[k].label),datasets:[
+{label:'Positive',data:keys.map(k=>(stats[k]||{}).positive||0),backgroundColor:'#10b981'},
+{label:'Neutral',data:keys.map(k=>(stats[k]||{}).neutral||0),backgroundColor:'#64748b'},
+{label:'Negative',data:keys.map(k=>(stats[k]||{}).negative||0),backgroundColor:'#ef4444'}
+]},
+options:{responsive:true,scales:{x:{stacked:true,grid:{color:'#334155'},ticks:{color:'#94a3b8'}},y:{stacked:true,grid:{color:'#334155'},ticks:{color:'#94a3b8'}}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}
+});
+
+// Posts tabs
+const postTabs=document.getElementById('postTabs');
+const postsCont=document.getElementById('postsContainer');
+keys.forEach((k,i)=>{
+const btn=document.createElement('button');
+btn.className='tab'+(i===0?' active':'');
+btn.textContent=LAYERS[k].label;
+btn.onclick=()=>{
+document.querySelectorAll('#postTabs .tab').forEach(t=>t.classList.remove('active'));
+btn.classList.add('active');
+showPosts(k);
+};
+postTabs.appendChild(btn);
+});
+
+function showPosts(layer){
+const posts=topPosts[layer]||[];
+postsCont.innerHTML=posts.map(p=>`<div class="post">
+<div class="post-header"><div><span class="handle">${p.handle}</span> <span class="author">${p.author||''}</span></div>
+<span class="badge ${p.sentiment}">${p.sentiment} (${(p.score||0).toFixed(2)})</span></div>
+<div class="text">${p.text}</div>
+<div class="metrics"><span>💬 ${p.replies||0}</span><span>🔁 ${p.reposts||0}</span><span>❤️ ${p.likes||0}</span><span>👁 ${p.views||0}</span></div>
+</div>`).join('');
+}
+showPosts(keys[0]);
 
 // Trending
-const tg = document.getElementById('trending-grid');
-trendingData.forEach(t => {
-    tg.innerHTML += `<div class="trend-card">
-        <div class="trend-topic">${t.topic}</div>
-        <div class="trend-meta">${t.category || ''} ${t.count ? '· ' + t.count + ' posts' : ''}</div>
-    </div>`;
+const tList=document.getElementById('trendingList');
+trending.forEach(t=>{
+tList.innerHTML+=`<div class="trend-item">${t.topic}<div class="cat">${t.category} ${t.count?'· '+t.count+' posts':''}</div></div>`;
 });
-
-// Filter + tweets
-let activeFilter = 'all';
-const fb = document.getElementById('filter-bar');
-fb.innerHTML = '<button class="filter-btn active" data-layer="all">All</button>';
-Object.entries(layerLabels).forEach(([k,v]) => {
-    fb.innerHTML += `<button class="filter-btn" data-layer="${k}">${v}</button>`;
-});
-fb.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        fb.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeFilter = btn.dataset.layer;
-        renderTweets();
-    });
-});
-
-function renderTweets() {
-    const tl = document.getElementById('tweets-list');
-    const filtered = activeFilter === 'all' ? recentData : recentData.filter(t => t.layer === activeFilter);
-    tl.innerHTML = filtered.slice(0, 50).map(t => `
-        <div class="tweet">
-            <div class="tweet-header">
-                <span class="tweet-handle">${t.handle}</span>
-                <span class="tweet-layer" style="border-color:${layerColors[t.layer] || '#334155'}">${layerLabels[t.layer] || t.layer}</span>
-            </div>
-            <div class="tweet-text">${t.text}</div>
-            <div class="tweet-meta">
-                <span class="${t.sentiment === 'positive' ? 'pos' : t.sentiment === 'negative' ? 'neg' : 'neu'}">${t.sentiment} (${t.score?.toFixed(2)})</span>
-                <span>${t.scraped?.substring(0, 16) || ''}</span>
-            </div>
-        </div>
-    `).join('');
-}
-renderTweets();
 </script>
 </body>
 </html>
