@@ -1,163 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>X Sentiment Dashboard — Noel Doherty</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X Sentiment Dashboard - AI & Tech Topics</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin:16px 0}
-.card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155}
-.card h3{color:#38bdf8;margin-bottom:12px;font-size:14px;text-transform:uppercase;letter-spacing:1px}
-.stat{font-size:36px;font-weight:700}
-.stat-label{color:#94a3b8;font-size:13px;margin-top:4px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:8px;border-bottom:2px solid #475569;color:#94a3b8;font-size:12px;text-transform:uppercase}
-h1{font-size:24px;margin-bottom:4px}
-.subtitle{color:#94a3b8;font-size:13px;margin-bottom:20px}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px}.header{text-align:center;padding:20px 0 30px}.header h1{font-size:2rem;color:#38bdf8}.header p{color:#94a3b8;margin-top:8px}.stats{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:30px}.stat-card{background:#1e293b;border-radius:12px;padding:20px 30px;text-align:center;min-width:150px}.stat-card .num{font-size:2rem;font-weight:700;color:#38bdf8}.stat-card .label{color:#94a3b8;font-size:.85rem;margin-top:4px}.charts{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:30px;max-width:1200px;margin-left:auto;margin-right:auto}.chart-box{background:#1e293b;border-radius:12px;padding:20px}.chart-box h3{color:#38bdf8;margin-bottom:12px}.layer-section{max-width:1200px;margin:0 auto 20px}.layer-section h2{color:#38bdf8;margin-bottom:16px;border-bottom:1px solid #334155;padding-bottom:8px}.tweet-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(350px,1fr));gap:12px}.tweet-card{background:#1e293b;border-radius:10px;padding:16px;border-left:4px solid #64748b}.tweet-card.positive{border-left-color:#22c55e}.tweet-card.negative{border-left-color:#ef4444}.tweet-card.neutral{border-left-color:#eab308}.tweet-card .handle{color:#38bdf8;font-weight:600;font-size:.9rem}.tweet-card .text{margin-top:8px;font-size:.85rem;line-height:1.4;color:#cbd5e1}.tweet-card .meta{margin-top:8px;font-size:.75rem;color:#64748b}canvas{max-height:300px}@media(max-width:768px){.charts{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<h1>X Sentiment Dashboard</h1>
-<p class="subtitle">Auto-updated 2026-03-21 16:19 UTC · Tracking AI agents, crypto, XRP, singularity, local AI, indie SaaS, PM+AI, trending</p>
-
-<div class="grid">
-<div class="card"><h3>Total Posts</h3><div class="stat">59</div><div class="stat-label">tracked across all layers</div></div>
-<div class="card"><h3>Sentiment</h3><div class="stat" style="color:#22c55e">6</div><div class="stat-label">positive · 3 negative · 50 neutral</div></div>
-<div class="card"><h3>Layers Active</h3><div class="stat">7</div><div class="stat-label">topic layers being tracked</div></div>
+<div class="header"><h1>X Sentiment Dashboard</h1><p>AI & Tech Topic Tracker &middot; Last updated: 2026-03-21T17:17 UTC</p></div>
+<div class="stats">
+<div class="stat-card"><div class="num">34</div><div class="label">Total Posts</div></div>
+<div class="stat-card"><div class="num" style="color:#22c55e">1</div><div class="label">Positive</div></div>
+<div class="stat-card"><div class="num" style="color:#eab308">30</div><div class="label">Neutral</div></div>
+<div class="stat-card"><div class="num" style="color:#ef4444">3</div><div class="label">Negative</div></div>
+<div class="stat-card"><div class="num">8</div><div class="label">Layers Tracked</div></div>
 </div>
-
-<div class="grid">
-<div class="card"><h3>Posts by Layer</h3><canvas id="layerChart"></canvas></div>
-<div class="card"><h3>Sentiment Distribution</h3><canvas id="sentChart"></canvas></div>
-</div>
-
-<div class="grid">
-<div class="card"><h3>Posts Per Hour (Last 24h)</h3><canvas id="hourlyChart"></canvas></div>
-<div class="card"><h3>Trending Topics</h3><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>Anthropic launches recurring cloud-based task scheduling for Claude Code</strong> <span style="color:#94a3b8;font-size:12px">Other Trending 160 posts</span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>Daka</strong> <span style="color:#94a3b8;font-size:12px">Sports Trending </span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>SECOND HALF</strong> <span style="color:#94a3b8;font-size:12px">Trending UK </span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>#BBCFootball</strong> <span style="color:#94a3b8;font-size:12px">Sports Trending </span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>#COYW</strong> <span style="color:#94a3b8;font-size:12px">Trending UK </span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>darren england</strong> <span style="color:#94a3b8;font-size:12px">Sports Trending </span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>Shea Charles</strong> <span style="color:#94a3b8;font-size:12px">Sports Trending </span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>Iranian Air Defenses Strike US F-35 Fighter Jet Over Iran</strong> <span style="color:#94a3b8;font-size:12px">News 264 posts</span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>Nvidia CEO Hails OpenClaw as the New Computer in AI Agent Surge</strong> <span style="color:#94a3b8;font-size:12px">News 1,694 posts</span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>Peter Diamandis: Entrepreneurship Is the Only Reliable Career Now</strong> <span style="color:#94a3b8;font-size:12px">Other 716 posts</span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>XRP Ledger Hits Record 5.66 Million Wallets Amid ETF Inflows</strong> <span style="color:#94a3b8;font-size:12px">News 5.7K posts</span></div><div style="padding:8px 12px;background:#1e293b;border-radius:6px;margin:4px 0"><strong>OpenClaw AI Framework Surges with Nvidia CEO Praise and Community Guides</strong> <span style="color:#94a3b8;font-size:12px">News 379 posts</span></div></div>
-</div>
-
-<div class="card" style="margin-top:16px"><h3>Top Posts by Likes</h3>
-<div style="overflow-x:auto">
-<table>
-<tr><th>Handle</th><th>Text</th><th>Likes</th><th>Views</th><th>Sentiment</th><th>Layer</th></tr>
-<tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@Perplexity</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Announcing Personal Computer. Personal Computer is an always on, local merge with Perplexity Computer that works for you 24/7. Its personal, secure, and works across your files, apps, and sessions thr</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">32,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">14,000,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">local_ai</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@Okara</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Today we are introducing the worlds first AI CMO. Enter your website and it deploys a team of agents to help you get traffic and users. Try it now at okara.ai/cmo</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">27,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">13,000,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">agents</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@Brian Armstrong</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Very soon there are going to be more AI agents than humans making transactions. They cant open a bank account, but they can own a crypto wallet. Think about it.</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">20,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">4,600,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">crypto</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@levelsio</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">how to build a bootstrapped startup without funding: 1. pick a problem you personally have. 2. skip the pitch deck. open your code editor. ship something ugly in a weekend. 3. charge money from day 1.</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">12,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">605,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#ef4444;padding:2px 8px;border-radius:4px;font-size:12px">negative</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">indie_saas</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@Ripple</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Digital assets are moving from experimentation to real-world use. We see collaboration across the ecosystem as key to connecting onchain innovation with trusted global payments infrastructure.</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">7,400</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">707,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">xrp</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@All day Astronomy</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">NEWS: Renowned AI professor claims the universe is a simulation created to develop superintelligence and will soon be turned off.</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">5,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">894,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">singularity</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@Tuki</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Do you understand what JPMorgan just said in plain English. 40 to 150 billion in loans, the ones that funded companies that hired humans to do jobs, are about to blow up because AI is replacing the hu</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">3,900</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">619,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">pm_ai</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@The Rundown AI</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Anthropic just studied which jobs AI can theoretically replace vs which ones its actually automating right now. Computer and math: 94 percent exposed. Legal: 90 percent. Management, architecture, arts</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">3,100</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">406,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">pm_ai</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@0xMarioNawfal</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">This is the solo startup cheatsheet: n8n automation, Supabase backend, Cursor code, Claude thinking, Vercel deploy, Stripe payments, Resend emails, Framer landing page, PostHog analytics, Cloudflare s</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">2,300</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">154,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">indie_saas</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@naiive</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">2018 : graphic designer 2022: Crypto trader 2023: Prompt engineer 2026: AI agents 2028: Farmer</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">2,100</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">111,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">crypto</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@evernorthxrp</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">XRP is a fundamental piece in the full financial stack for modern global finance. The reframe that everyone should be talking about.</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">2,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">110,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">xrp</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@Muhammad Ayan</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">BREAKING: Yann LeCun just dropped a paper that should make every AI lab rethink its roadmap. One brutal conclusion: chasing AGI is the wrong goal.</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">2,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">200,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">singularity</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@0xMarioNawfal</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">1,900</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">214,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">agents</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@Dustin</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Elon Musk just described the terminal state of the global financial system. The banking sector is obsessed with fiat currency. Superintelligence wont even recognize it. Musk: I think money will stop b</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">1,900</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">186,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">singularity</span></td>
-        </tr><tr>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="color:#38bdf8">@0xMarioNawfal</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155;max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">1,900</td>
-            <td style="padding:8px;border-bottom:1px solid #334155;text-align:right">214,000</td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#94a3b8;padding:2px 8px;border-radius:4px;font-size:12px">neutral</span></td>
-            <td style="padding:8px;border-bottom:1px solid #334155"><span style="background:#475569;padding:2px 8px;border-radius:4px;font-size:12px">local_ai</span></td>
-        </tr>
-</table>
-</div></div>
-
+<div class="charts"><div class="chart-box"><h3>Posts by Layer</h3><canvas id="layerChart"></canvas></div><div class="chart-box"><h3>Overall Sentiment</h3><canvas id="sentimentChart"></canvas></div></div>
+<div class="charts"><div class="chart-box"><h3>Sentiment by Layer</h3><canvas id="stackedChart"></canvas></div><div class="chart-box"><h3>Trending Topics</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px"><div style="background:#1e293b;border-radius:8px;padding:12px 16px"><div style="font-weight:600;color:#f1f5f9">Nvidia CEO Hails OpenClaw as New Computer in AI Agent Surge</div><div style="color:#64748b;font-size:.8rem">News &middot; 1,846 posts</div></div><div style="background:#1e293b;border-radius:8px;padding:12px 16px"><div style="font-weight:600;color:#f1f5f9">OpenClaw AI Framework Surges</div><div style="color:#64748b;font-size:.8rem">News &middot; 417 posts</div></div><div style="background:#1e293b;border-radius:8px;padding:12px 16px"><div style="font-weight:600;color:#f1f5f9">XRP Ledger Hits Record 5.66M Wallets</div><div style="color:#64748b;font-size:.8rem">News &middot; 6K posts</div></div><div style="background:#1e293b;border-radius:8px;padding:12px 16px"><div style="font-weight:600;color:#f1f5f9">Claude AI Tools Thread Trending</div><div style="color:#64748b;font-size:.8rem">Other &middot; 404 posts</div></div></div></div></div>
 <script>
-const layerCtx=document.getElementById('layerChart').getContext('2d');
-new Chart(layerCtx,{type:'bar',data:{labels:["xrp", "crypto", "pm_ai", "local_ai", "indie_saas", "singularity", "agents"],datasets:[{label:'Posts',data:[13, 9, 8, 8, 8, 7, 6],backgroundColor:'#38bdf8'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#94a3b8'},grid:{color:'#334155'}},x:{ticks:{color:'#94a3b8'},grid:{display:false}}}}});
-const sentCtx=document.getElementById('sentChart').getContext('2d');
-new Chart(sentCtx,{type:'doughnut',data:{labels:['Positive','Negative','Neutral'],datasets:[{data:[6,3,50],backgroundColor:['#22c55e','#ef4444','#64748b']}]},options:{responsive:true,plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
-const hCtx=document.getElementById('hourlyChart').getContext('2d');
-new Chart(hCtx,{type:'line',data:{labels:["21T16"],datasets:[{label:'Posts',data:[59],borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,0.1)',fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#94a3b8'},grid:{color:'#334155'}},x:{ticks:{color:'#94a3b8',maxRotation:45},grid:{display:false}}}}});
+const cd={labels:["AI Agents","Crypto AI","XRP/Ripple","Singularity/AGI","Local AI","Indie SaaS","PM+AI","Trending"],counts:[5,6,8,3,4,5,3,0],sentiment:{positive:[0,0,1,0,0,0,0,0],negative:[0,1,0,0,0,0,2,0],neutral:[5,5,7,3,4,5,1,0]}};
+const os={positive:1,negative:3,neutral:30};
+new Chart(document.getElementById('layerChart'),{type:'bar',data:{labels:cd.labels,datasets:[{label:'Posts',data:cd.counts,backgroundColor:'#38bdf8'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{color:'#94a3b8'}},x:{ticks:{color:'#94a3b8'}}}}});
+new Chart(document.getElementById('sentimentChart'),{type:'doughnut',data:{labels:['Positive','Neutral','Negative'],datasets:[{data:[os.positive,os.neutral,os.negative],backgroundColor:['#22c55e','#eab308','#ef4444']}]},options:{responsive:true,plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
+new Chart(document.getElementById('stackedChart'),{type:'bar',data:{labels:cd.labels,datasets:[{label:'Positive',data:cd.sentiment.positive,backgroundColor:'#22c55e'},{label:'Neutral',data:cd.sentiment.neutral,backgroundColor:'#eab308'},{label:'Negative',data:cd.sentiment.negative,backgroundColor:'#ef4444'}]},options:{responsive:true,scales:{x:{stacked:true,ticks:{color:'#94a3b8'}},y:{stacked:true,beginAtZero:true,ticks:{color:'#94a3b8'}}},plugins:{legend:{labels:{color:'#e2e8f0'}}}}});
 </script>
-</body>
-</html>
+<div style="text-align:center;padding:30px;color:#475569;font-size:.8rem">Noel Doherty's X Sentiment Tracker &middot; Auto-updated hourly &middot; 2026-03-21T17:17 UTC</div>
+</body></html>
