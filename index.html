@@ -3,20 +3,370 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>X Sentiment Dashboard – AI & Tech</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<title>X Sentiment Tracker - AI & Tech</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1419;color:#e7e9ea;min-height:100vh}
-.header{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:24px 32px;border-bottom:1px solid #2f3336;display:flex;justify-content:space-between;align-items:center}
-.header h1{font-size:24px;background:linear-gradient(90deg,#1d9bf0,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.header .updated{color:#71767b;font-size:13px}
-.container{max-width:1400px;margin:0 auto;padding:24px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
-.tab{padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px;font-weight:600;background:#1e2732;color:#8899a6;border:1px solid #2f3336;transition:all .2s}
-.tab:hover{background:#253341}
-.tab.active{background:#1d9bf0;color:#fff;border-color:#1d9bf0}
-.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
-.kpi{background:#1e2732;border-radius:12px;padding:20px;border:1px solid #2f3336}
-.kpi .label{font-size:12px;color:#71767b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-.kpi .valu
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#0f172a; color:#e2e8f0; min-height:100vh; }
+.header { background:linear-gradient(135deg,#1e293b,#0f172a); padding:2rem; text-align:center; border-bottom:1px solid #334155; }
+.header h1 { font-size:2rem; background:linear-gradient(90deg,#3b82f6,#8b5cf6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.header .updated { color:#94a3b8; margin-top:0.5rem; font-size:0.9rem; }
+.container { max-width:1400px; margin:0 auto; padding:1.5rem; }
+.charts-section { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:2rem; }
+.chart-card { background:#1e293b; border-radius:12px; padding:1.5rem; border:1px solid #334155; }
+.chart-card h3 { margin-bottom:1rem; color:#94a3b8; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(400px,1fr)); gap:1.5rem; }
+.layer-card { background:#1e293b; border-radius:12px; overflow:hidden; border:1px solid #334155; }
+.card-header { padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; }
+.card-header h2 { font-size:1.2rem; }
+.total-badge { background:#334155; padding:0.25rem 0.75rem; border-radius:999px; font-size:0.85rem; }
+.sentiment-bar { display:flex; height:8px; margin:0 1.5rem; border-radius:4px; overflow:hidden; }
+.bar-positive { background:#22c55e; }
+.bar-neutral { background:#64748b; }
+.bar-negative { background:#ef4444; }
+.sentiment-labels { display:flex; justify-content:space-between; padding:0.5rem 1.5rem; font-size:0.85rem; }
+.pos { color:#22c55e; } .neu { color:#94a3b8; } .neg { color:#ef4444; }
+.metrics-row { display:flex; justify-content:space-around; padding:1rem 1.5rem; border-top:1px solid #334155; }
+.metric { text-align:center; }
+.metric-val { display:block; font-size:1.2rem; font-weight:700; color:#f8fafc; }
+.metric-label { font-size:0.75rem; color:#94a3b8; }
+.top-posts { padding:1rem 1.5rem; border-top:1px solid #334155; }
+.top-posts h3 { font-size:0.95rem; color:#94a3b8; margin-bottom:0.75rem; }
+.post { padding:0.75rem; margin-bottom:0.5rem; border-radius:8px; background:#0f172a; border-left:3px solid #64748b; }
+.post.positive { border-left-color:#22c55e; }
+.post.negative { border-left-color:#ef4444; }
+.post-header { font-size:0.85rem; margin-bottom:0.25rem; }
+.handle { color:#94a3b8; font-size:0.8rem; }
+.post-text { font-size:0.85rem; color:#cbd5e1; line-height:1.4; }
+.post-metrics { font-size:0.75rem; color:#64748b; margin-top:0.25rem; }
+.trending-section { background:#1e293b; border-radius:12px; padding:1.5rem; margin-bottom:2rem; border:1px solid #334155; }
+.trending-section h2 { margin-bottom:1rem; }
+.trending-item { display:inline-flex; align-items:center; gap:0.5rem; background:#0f172a; padding:0.5rem 1rem; border-radius:999px; margin:0.25rem; font-size:0.85rem; }
+.trending-item .topic { color:#f8fafc; font-weight:600; }
+.trending-item .category { color:#94a3b8; }
+.trending-item .count { color:#64748b; font-size:0.75rem; }
+.no-data { color:#64748b; font-style:italic; font-size:0.85rem; }
+canvas { max-height:300px; }
+@media(max-width:900px) { .charts-section,.grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="header">
+    <h1>X Sentiment Tracker</h1>
+    <div class="updated">Last updated: 2026-03-21 12:14 UTC</div>
+</div>
+<div class="container">
+    <div class="charts-section">
+        <div class="chart-card"><h3>Posts by Layer</h3><canvas id="postsChart"></canvas></div>
+        <div class="chart-card"><h3>Sentiment Distribution</h3><canvas id="sentimentChart"></canvas></div>
+    </div>
+    <div class="trending-section"><h2>🔥 Trending on X</h2><div class="trending-item"><span class="topic">Anthropic Launches Projects Feature for Claude Cowork Tool</span><span class="category">Other</span><span class="count">135 posts posts</span></div><div class="trending-item"><span class="topic">OpenClaw Tops GitHub as AI Agent Powerhouse</span><span class="category">News</span><span class="count">879 posts posts</span></div><div class="trending-item"><span class="topic">#BTSLiveonNetflix</span><span class="category">Trending in United Kingdom</span></div><div class="trending-item"><span class="topic">vmin</span><span class="category">Music</span></div><div class="trending-item"><span class="topic">#TheAmazingDigitalCircus</span><span class="category">Only on X</span></div><div class="trending-item"><span class="topic">Wall Street</span><span class="category">Trending</span></div><div class="trending-item"><span class="topic">Mikrokosmos</span><span class="category">Music</span></div><div class="trending-item"><span class="topic">Ozoro</span><span class="category">Trending in United Kingdom</span></div><div class="trending-item"><span class="topic">Elon Musk&#x27;s First Principles Thinking Resurfaces in Viral Clips</span><span class="category">Other</span><span class="count">476 posts posts</span></div><div class="trending-item"><span class="topic">AEK Defender&#x27;s Stunned Red Card Protest Steals Show in Palace Win</span><span class="category">Sports</span><span class="count">1.8K posts posts</span></div><div class="trending-item"><span class="topic">Claude AI Tools Tackle Real Work Beyond Casual Chats</span><span class="category">News</span><span class="count">142 posts posts</span></div></div>
+    <div class="grid">
+        <div class="layer-card">
+            <div class="card-header" style="border-left: 4px solid #3b82f6">
+                <h2>AI Agents</h2>
+                <span class="total-badge">6 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <div class="bar-positive" style="width:17%" title="Positive 17%"></div>
+                <div class="bar-neutral" style="width:66%" title="Neutral 66%"></div>
+                <div class="bar-negative" style="width:17%" title="Negative 17%"></div>
+            </div>
+            <div class="sentiment-labels">
+                <span class="pos">👍 17%</span>
+                <span class="neu">😐 66%</span>
+                <span class="neg">👎 17%</span>
+            </div>
+            <div class="metrics-row">
+                <div class="metric"><span class="metric-val">8,765</span><span class="metric-label">Avg Likes</span></div>
+                <div class="metric"><span class="metric-val">1,407</span><span class="metric-label">Avg Reposts</span></div>
+                <div class="metric"><span class="metric-val">3,199,000</span><span class="metric-label">Avg Views</span></div>
+            </div>
+            <div class="top-posts"><h3>Top Posts</h3><div class="post neutral">
+                <div class="post-header"><strong>Okara</strong> <span class="handle">@askOkara</span></div>
+                <div class="post-text">Today we are introducing the world&#x27;s first AI CMO.</div>
+                <div class="post-metrics">❤️ 27,000 🔄 3,900 👁️ 13,000,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Brian Armstrong</strong> <span class="handle">@brian_armstrong</span></div>
+                <div class="post-text">Very soon there are going to be more AI agents than humans making transactions. They can not open a bank account, but they can own a crypto wallet. Think about it.</div>
+                <div class="post-metrics">❤️ 20,000 🔄 3,800 👁️ 4,600,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Rohan Paul</strong> <span class="handle">@rohanpaul_ai</span></div>
+                <div class="post-text">Google just dropped AI agents into the planet&#x27;s biggest application, Google Map. Launched today across the United States and India. This fundamentally positions an AI model as the primary gatekeeper b</div>
+                <div class="post-metrics">❤️ 2,000 🔄 300 👁️ 500,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>0xMarioNawfal</strong> <span class="handle">@RoundtableSpace</span></div>
+                <div class="post-text">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</div>
+                <div class="post-metrics">❤️ 1,900 🔄 186 👁️ 214,000</div>
+            </div><div class="post positive">
+                <div class="post-header"><strong>Rohan Paul</strong> <span class="handle">@rohanpaul_ai</span></div>
+                <div class="post-text">Chamath on how AI agents are making the 10x engineer distinction disappear because the most efficient code paths are now obvious to everyone. Just as AI solved chess and removed the mystery of the bes</div>
+                <div class="post-metrics">❤️ 937 🔄 191 👁️ 703,000</div>
+            </div></div>
+        </div>
+        <div class="layer-card">
+            <div class="card-header" style="border-left: 4px solid #f59e0b">
+                <h2>Crypto AI Agents</h2>
+                <span class="total-badge">5 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <div class="bar-positive" style="width:0%" title="Positive 0%"></div>
+                <div class="bar-neutral" style="width:100%" title="Neutral 100%"></div>
+                <div class="bar-negative" style="width:0%" title="Negative 0%"></div>
+            </div>
+            <div class="sentiment-labels">
+                <span class="pos">👍 0%</span>
+                <span class="neu">😐 100%</span>
+                <span class="neg">👎 0%</span>
+            </div>
+            <div class="metrics-row">
+                <div class="metric"><span class="metric-val">4,282</span><span class="metric-label">Avg Likes</span></div>
+                <div class="metric"><span class="metric-val">808</span><span class="metric-label">Avg Reposts</span></div>
+                <div class="metric"><span class="metric-val">964,800</span><span class="metric-label">Avg Views</span></div>
+            </div>
+            <div class="top-posts"><h3>Top Posts</h3><div class="post neutral">
+                <div class="post-header"><strong>Brian Armstrong</strong> <span class="handle">@brian_armstrong</span></div>
+                <div class="post-text">Very soon there are going to be more AI agents than humans making transactions. They cant open a bank account, but they can own a crypto wallet. Think about it.</div>
+                <div class="post-metrics">❤️ 20,000 🔄 3,800 👁️ 4,600,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Miles Deutscher</strong> <span class="handle">@milesdeutscher</span></div>
+                <div class="post-text">The last 30 days in crypto have been massive for AI agents and DeFi integration.</div>
+                <div class="post-metrics">❤️ 500 🔄 60 👁️ 50,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Cointelegraph</strong> <span class="handle">@Cointelegraph</span></div>
+                <div class="post-text">INSIGHT: PayPal Ventures backed Magic Labs just launched Newton, a platform for verifiable AI agents in crypto. It lets users automate tasks like portfolio rebalancing or recurring buys without giving</div>
+                <div class="post-metrics">❤️ 404 🔄 125 👁️ 82,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Miles Deutscher</strong> <span class="handle">@milesdeutscher</span></div>
+                <div class="post-text">AI agents are the hottest trend in crypto right now. But GOAT, LUNA, VIRTUAL have already had massive runs. So what could be the NEXT big AI play?</div>
+                <div class="post-metrics">❤️ 304 🔄 36 👁️ 62,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>naiive</strong> <span class="handle">@naiivememe</span></div>
+                <div class="post-text">2018: graphic designer. 2022: Crypto trader. 2023: Prompt engineer. 2026: AI agents. 2028: Farmer</div>
+                <div class="post-metrics">❤️ 200 🔄 20 👁️ 30,000</div>
+            </div></div>
+        </div>
+        <div class="layer-card">
+            <div class="card-header" style="border-left: 4px solid #10b981">
+                <h2>XRP / Ripple</h2>
+                <span class="total-badge">4 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <div class="bar-positive" style="width:25%" title="Positive 25%"></div>
+                <div class="bar-neutral" style="width:75%" title="Neutral 75%"></div>
+                <div class="bar-negative" style="width:0%" title="Negative 0%"></div>
+            </div>
+            <div class="sentiment-labels">
+                <span class="pos">👍 25%</span>
+                <span class="neu">😐 75%</span>
+                <span class="neg">👎 0%</span>
+            </div>
+            <div class="metrics-row">
+                <div class="metric"><span class="metric-val">2,490</span><span class="metric-label">Avg Likes</span></div>
+                <div class="metric"><span class="metric-val">626</span><span class="metric-label">Avg Reposts</span></div>
+                <div class="metric"><span class="metric-val">285,250</span><span class="metric-label">Avg Views</span></div>
+            </div>
+            <div class="top-posts"><h3>Top Posts</h3><div class="post neutral">
+                <div class="post-header"><strong>kouji</strong> <span class="handle">@yoyonofukuoka</span></div>
+                <div class="post-text">This is not financial advice or anything of the sort; it is merely the result of an amateur like myself arbitrarily predicting the timing of an XRP surge. Many XRP holders believe the Clarity Act is a</div>
+                <div class="post-metrics">❤️ 7,400 🔄 2,000 👁️ 706,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Asheesh Birla</strong> <span class="handle">@AshBirla</span></div>
+                <div class="post-text">A commentary Ive heard within the XRP community this month is some version of why is XRP price dislodged from adoption metrics. Heres my quick take: XRP is not yet a liquidity bridge at scale.</div>
+                <div class="post-metrics">❤️ 1,500 🔄 378 👁️ 201,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>No Regrets</strong> <span class="handle">@NoRegretNoGain</span></div>
+                <div class="post-text">I have gone down a rabbit hole on XRP. What I have gathered: 50,000 to become a millionaire. Its not going to $589. The community is locked in.</div>
+                <div class="post-metrics">❤️ 560 🔄 24 👁️ 154,000</div>
+            </div><div class="post positive">
+                <div class="post-header"><strong>Ripple</strong> <span class="handle">@Ripple</span></div>
+                <div class="post-text">Digital assets are moving from experimentation to real-world use. We see collaboration across the ecosystem as key to connecting onchain innovation with trusted global payments infrastructure. Initiat</div>
+                <div class="post-metrics">❤️ 500 🔄 100 👁️ 80,000</div>
+            </div></div>
+        </div>
+        <div class="layer-card">
+            <div class="card-header" style="border-left: 4px solid #8b5cf6">
+                <h2>Singularity / AGI</h2>
+                <span class="total-badge">3 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <div class="bar-positive" style="width:0%" title="Positive 0%"></div>
+                <div class="bar-neutral" style="width:67%" title="Neutral 67%"></div>
+                <div class="bar-negative" style="width:33%" title="Negative 33%"></div>
+            </div>
+            <div class="sentiment-labels">
+                <span class="pos">👍 0%</span>
+                <span class="neu">😐 67%</span>
+                <span class="neg">👎 33%</span>
+            </div>
+            <div class="metrics-row">
+                <div class="metric"><span class="metric-val">2,481</span><span class="metric-label">Avg Likes</span></div>
+                <div class="metric"><span class="metric-val">333</span><span class="metric-label">Avg Reposts</span></div>
+                <div class="metric"><span class="metric-val">475,000</span><span class="metric-label">Avg Views</span></div>
+            </div>
+            <div class="top-posts"><h3>Top Posts</h3><div class="post neutral">
+                <div class="post-header"><strong>All day Astronomy</strong> <span class="handle">@forallcurious</span></div>
+                <div class="post-text">NEWS: Renowned AI professor claims the universe is a simulation created to develop superintelligence and will soon be turned off.</div>
+                <div class="post-metrics">❤️ 5,000 🔄 576 👁️ 894,000</div>
+            </div><div class="post negative">
+                <div class="post-header"><strong>Chubby</strong> <span class="handle">@kimmonismus</span></div>
+                <div class="post-text">Nobody is prepared for what is coming with AGI. We here on X live in an AI bubble. We know the different AI companies, understand the different models, their advantages and also limitations. 99% of pe</div>
+                <div class="post-metrics">❤️ 1,500 🔄 270 👁️ 385,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Dustin</strong> <span class="handle">@r0ck3t23</span></div>
+                <div class="post-text">Elon Musk just described the terminal state of the global financial system. The banking sector is obsessed with fiat currency. Superintelligence wont even recognize it. Musk: I think money will stop b</div>
+                <div class="post-metrics">❤️ 943 🔄 153 👁️ 146,000</div>
+            </div></div>
+        </div>
+        <div class="layer-card">
+            <div class="card-header" style="border-left: 4px solid #ef4444">
+                <h2>Local AI / On-Device</h2>
+                <span class="total-badge">4 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <div class="bar-positive" style="width:0%" title="Positive 0%"></div>
+                <div class="bar-neutral" style="width:100%" title="Neutral 100%"></div>
+                <div class="bar-negative" style="width:0%" title="Negative 0%"></div>
+            </div>
+            <div class="sentiment-labels">
+                <span class="pos">👍 0%</span>
+                <span class="neu">😐 100%</span>
+                <span class="neg">👎 0%</span>
+            </div>
+            <div class="metrics-row">
+                <div class="metric"><span class="metric-val">8,596</span><span class="metric-label">Avg Likes</span></div>
+                <div class="metric"><span class="metric-val">1,495</span><span class="metric-label">Avg Reposts</span></div>
+                <div class="metric"><span class="metric-val">3,579,250</span><span class="metric-label">Avg Views</span></div>
+            </div>
+            <div class="top-posts"><h3>Top Posts</h3><div class="post neutral">
+                <div class="post-header"><strong>Perplexity</strong> <span class="handle">@perplexity_ai</span></div>
+                <div class="post-text">Announcing Personal Computer. Personal Computer is an always on, local merge with Perplexity Computer that works for you 24/7. Its personal, secure, and works across your files, apps, and sessions thr</div>
+                <div class="post-metrics">❤️ 32,000 🔄 5,700 👁️ 14,000,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>0xMarioNawfal</strong> <span class="handle">@RoundtableSpace</span></div>
+                <div class="post-text">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</div>
+                <div class="post-metrics">❤️ 1,900 🔄 186 👁️ 214,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Rohan Paul</strong> <span class="handle">@rohanpaul_ai</span></div>
+                <div class="post-text">Google just dropped AI agents into the planets biggest application, Google Map. Launched today across the United States and India. This fundamentally positions an AI model as the primary gatekeeper be</div>
+                <div class="post-metrics">❤️ 282 🔄 64 👁️ 63,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Min Choi</strong> <span class="handle">@minchoi</span></div>
+                <div class="post-text">AI agents are coming to your computer. Metas Manus AI just moved from the cloud onto your desktop. Local files, terminal, apps, compute.</div>
+                <div class="post-metrics">❤️ 200 🔄 30 👁️ 40,000</div>
+            </div></div>
+        </div>
+        <div class="layer-card">
+            <div class="card-header" style="border-left: 4px solid #06b6d4">
+                <h2>Indie SaaS</h2>
+                <span class="total-badge">3 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <div class="bar-positive" style="width:33%" title="Positive 33%"></div>
+                <div class="bar-neutral" style="width:67%" title="Neutral 67%"></div>
+                <div class="bar-negative" style="width:0%" title="Negative 0%"></div>
+            </div>
+            <div class="sentiment-labels">
+                <span class="pos">👍 33%</span>
+                <span class="neu">😐 67%</span>
+                <span class="neg">👎 0%</span>
+            </div>
+            <div class="metrics-row">
+                <div class="metric"><span class="metric-val">4,933</span><span class="metric-label">Avg Likes</span></div>
+                <div class="metric"><span class="metric-val">443</span><span class="metric-label">Avg Reposts</span></div>
+                <div class="metric"><span class="metric-val">351,667</span><span class="metric-label">Avg Views</span></div>
+            </div>
+            <div class="top-posts"><h3>Top Posts</h3><div class="post neutral">
+                <div class="post-header"><strong>levelsio</strong> <span class="handle">@levelsio</span></div>
+                <div class="post-text">how to build a bootstrapped startup without funding: 1. pick a problem you personally have. if you dont use your own product daily, quit now. 2. skip the pitch deck. open your code editor. ship someth</div>
+                <div class="post-metrics">❤️ 12,000 🔄 1,100 👁️ 605,000</div>
+            </div><div class="post positive">
+                <div class="post-header"><strong>Ben Cera</strong> <span class="handle">@Bencera</span></div>
+                <div class="post-text">About to hit $4.5M run rate. Still 1 founder + AI. Zero employees. Honest moment: this past week almost broke me. No one prepares you for what PMF actually feels like. Every infra partner hitting rate</div>
+                <div class="post-metrics">❤️ 2,000 🔄 150 👁️ 300,000</div>
+            </div><div class="post neutral">
+                <div class="post-header"><strong>Unknown</strong> <span class="handle">@someuser</span></div>
+                <div class="post-text">Ben is on the pathway to become the first billion dollar solo founder. In less than 2 months he has grown from 0-4.4M in ARR. This is absolutely insane. Weve entered clearly unchartered territory. Unr</div>
+                <div class="post-metrics">❤️ 800 🔄 80 👁️ 150,000</div>
+            </div></div>
+        </div>
+        <div class="layer-card">
+            <div class="card-header" style="border-left: 4px solid #f97316">
+                <h2>PM AI / Jobs</h2>
+                <span class="total-badge">3 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <div class="bar-positive" style="width:0%" title="Positive 0%"></div>
+                <div class="bar-neutral" style="width:0%" title="Neutral 0%"></div>
+                <div class="bar-negative" style="width:100%" title="Negative 100%"></div>
+            </div>
+            <div class="sentiment-labels">
+                <span class="pos">👍 0%</span>
+                <span class="neu">😐 0%</span>
+                <span class="neg">👎 100%</span>
+            </div>
+            <div class="metrics-row">
+                <div class="metric"><span class="metric-val">1,293</span><span class="metric-label">Avg Likes</span></div>
+                <div class="metric"><span class="metric-val">253</span><span class="metric-label">Avg Reposts</span></div>
+                <div class="metric"><span class="metric-val">185,333</span><span class="metric-label">Avg Views</span></div>
+            </div>
+            <div class="top-posts"><h3>Top Posts</h3><div class="post negative">
+                <div class="post-header"><strong>Dustin</strong> <span class="handle">@r0ck3t23</span></div>
+                <div class="post-text">Bret Taylor, former co-CEO of Salesforce and chair of OpenAI, just redefined the unit of productivity. Its not a person. Its a process. Taylor: I think the atomic unit of productivity in AI is a proce</div>
+                <div class="post-metrics">❤️ 3,100 🔄 623 👁️ 406,000</div>
+            </div><div class="post negative">
+                <div class="post-header"><strong>Tuki</strong> <span class="handle">@TukiFromKL</span></div>
+                <div class="post-text">Do you understand what JPMorgan just said in plain English. Stop scrolling and read. $40 to $150 billion in loans. the ones that funded companies that hired humans to do jobs are about to blow up beca</div>
+                <div class="post-metrics">❤️ 478 🔄 95 👁️ 100,000</div>
+            </div><div class="post negative">
+                <div class="post-header"><strong>Unknown</strong> <span class="handle">@unknown_pm</span></div>
+                <div class="post-text">AI is not replacing project managers. AI is replacing project managers who refuse to use AI. The best PMs are now using AI for sprint planning, risk assessment, and stakeholder communication.</div>
+                <div class="post-metrics">❤️ 300 🔄 40 👁️ 50,000</div>
+            </div></div>
+        </div>
+        <div class="layer-card">
+            <div class="card-header" style="border-left: 4px solid #ec4899">
+                <h2>Trending</h2>
+                <span class="total-badge">0 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <div class="bar-positive" style="width:0%" title="Positive 0%"></div>
+                <div class="bar-neutral" style="width:100%" title="Neutral 100%"></div>
+                <div class="bar-negative" style="width:0%" title="Negative 0%"></div>
+            </div>
+            <div class="sentiment-labels">
+                <span class="pos">👍 0%</span>
+                <span class="neu">😐 100%</span>
+                <span class="neg">👎 0%</span>
+            </div>
+            <div class="metrics-row">
+                <div class="metric"><span class="metric-val">0</span><span class="metric-label">Avg Likes</span></div>
+                <div class="metric"><span class="metric-val">0</span><span class="metric-label">Avg Reposts</span></div>
+                <div class="metric"><span class="metric-val">0</span><span class="metric-label">Avg Views</span></div>
+            </div>
+            <div class="top-posts"><h3>Top Posts</h3><p class="no-data">No posts yet</p></div>
+        </div></div>
+</div>
+<script>
+const labels = ["AI Agents", "Crypto AI Agents", "XRP / Ripple", "Singularity / AGI", "Local AI / On-Device", "Indie SaaS", "PM AI / Jobs", "Trending"];
+const colors = ["#3b82f6", "#f59e0b", "#10b981", "#8b5cf6", "#ef4444", "#06b6d4", "#f97316", "#ec4899"];
+new Chart(document.getElementById('postsChart'), {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Total Posts', data: [6, 5, 4, 3, 4, 3, 3, 0], backgroundColor: colors }] },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } } }
+});
+new Chart(document.getElementById('sentimentChart'), {
+    type: 'bar',
+    data: {
+        labels,
+        datasets: [
+            { label: 'Positive', data: [1, 0, 1, 0, 0, 1, 0, 0], backgroundColor: '#22c55e' },
+            { label: 'Neutral', data: [4, 5, 3, 2, 4, 2, 0, 0], backgroundColor: '#64748b' },
+            { label: 'Negative', data: [1, 0, 0, 1, 0, 0, 3, 0], backgroundColor: '#ef4444' }
+        ]
+    },
+    options: { responsive: true, scales: { x: { stacked: true, ticks: { color: '#94a3b8' } }, y: { stacked: true, beginAtZero: true, ticks: { color: '#94a3b8' } } }, plugins: { legend: { labels: { color: '#e2e8f0' } } } }
+});
+</script>
+</body>
+</html>
