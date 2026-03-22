@@ -1,760 +1,321 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>X Sentiment Dashboard - AI & Crypto Tracker</title>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X Sentiment Dashboard - AI Agents Tracker</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0d1117;color:#c9d1d9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;padding:20px}
-.header{text-align:center;padding:20px 0;border-bottom:1px solid #30363d;margin-bottom:20px}
-.header h1{color:#58a6ff;font-size:28px;margin-bottom:8px}
-.header .subtitle{color:#8b949e;font-size:14px}
-.kpi-row{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap}
-.kpi{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;flex:1;min-width:150px;text-align:center}
-.kpi .value{font-size:28px;font-weight:700;color:#58a6ff}
-.kpi .label{font-size:12px;color:#8b949e;margin-top:4px}
-.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-.tab{padding:8px 16px;border-radius:20px;border:1px solid #30363d;background:#161b22;color:#8b949e;cursor:pointer;font-size:13px;transition:all 0.2s}
-.tab:hover,.tab.active{background:#1f6feb;color:#fff;border-color:#1f6feb}
-.layer-section{display:none}
-.layer-section.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-bottom:24px}
-.card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px}
-.card h3{color:#58a6ff;font-size:14px;margin-bottom:8px}
-.tweet-card{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px;margin-bottom:10px}
-.tweet-card .handle{color:#58a6ff;font-weight:600;font-size:13px}
-.tweet-card .text{color:#c9d1d9;font-size:13px;margin:6px 0;line-height:1.4}
-.tweet-card .metrics{display:flex;gap:16px;font-size:12px;color:#8b949e}
-.tweet-card .metrics span{display:flex;align-items:center;gap:4px}
-.sentiment-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
-.sentiment-positive{background:#1a3a1a;color:#3fb950}
-.sentiment-negative{background:#3a1a1a;color:#f85149}
-.sentiment-neutral{background:#1a2a3a;color:#58a6ff}
-.chart-container{position:relative;height:250px;margin-top:10px}
-.trending-list{list-style:none}
-.trending-list li{padding:8px 0;border-bottom:1px solid #21262d;display:flex;justify-content:space-between}
-.trending-list li .rank{color:#8b949e;width:30px}
-.trending-list li .topic{color:#c9d1d9;flex:1;font-weight:500}
-.trending-list li .cat{color:#8b949e;font-size:12px}
-.news-item{padding:10px 0;border-bottom:1px solid #21262d}
-.news-item .headline{color:#58a6ff;font-size:14px;font-weight:500}
-.news-item .meta{color:#8b949e;font-size:12px;margin-top:4px}
-</style></head><body>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a1a; color: #e0e0e0; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1a1a3e 0%, #0d0d2b 100%); padding: 24px 32px; border-bottom: 1px solid #2a2a5a; display: flex; justify-content: space-between; align-items: center; }
+.header h1 { font-size: 24px; color: #fff; }
+.header .subtitle { color: #8888aa; font-size: 14px; margin-top: 4px; }
+.header .updated { color: #6666aa; font-size: 13px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.card { background: #12122a; border: 1px solid #2a2a5a; border-radius: 12px; padding: 20px; }
+.card h3 { font-size: 16px; color: #aaaacc; margin-bottom: 12px; }
+.stat-value { font-size: 32px; font-weight: 700; color: #fff; }
+.stat-label { font-size: 13px; color: #6666aa; margin-top: 4px; }
+.sentiment-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 12px; }
+.sentiment-bar .pos { background: #22c55e; }
+.sentiment-bar .neu { background: #6666aa; }
+.sentiment-bar .neg { background: #ef4444; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.badge.positive { background: #22c55e22; color: #22c55e; }
+.badge.negative { background: #ef444422; color: #ef4444; }
+.badge.neutral { background: #6666aa22; color: #6666aa; }
+.tweet-list { margin-top: 24px; }
+.tweet { background: #12122a; border: 1px solid #2a2a5a; border-radius: 8px; padding: 16px; margin-bottom: 8px; }
+.tweet .meta { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.tweet .handle { color: #8888cc; font-weight: 600; }
+.tweet .layer-tag { color: #6666aa; font-size: 12px; background: #1a1a3e; padding: 2px 8px; border-radius: 8px; }
+.tweet .text { font-size: 14px; line-height: 1.5; color: #ccc; }
+.tweet .metrics { display: flex; gap: 16px; margin-top: 8px; font-size: 12px; color: #6666aa; }
+.chart-container { background: #12122a; border: 1px solid #2a2a5a; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+.trending-list { columns: 2; column-gap: 16px; }
+.trending-item { background: #12122a; border: 1px solid #2a2a5a; border-radius: 8px; padding: 12px; margin-bottom: 8px; break-inside: avoid; }
+.trending-item .topic { font-weight: 600; color: #fff; }
+.trending-item .cat { font-size: 12px; color: #6666aa; }
+.tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { padding: 8px 16px; border-radius: 8px; background: #1a1a3e; color: #8888cc; border: 1px solid #2a2a5a; cursor: pointer; font-size: 13px; }
+.tab.active { background: #2a2a6a; color: #fff; border-color: #4444aa; }
+.section-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+</style>
+</head>
+<body>
 <div class="header">
-<h1>X Sentiment Dashboard</h1>
-<p class="subtitle">AI & Crypto Tracker | Last updated: 2026-03-22 00:17 UTC</p>
+  <div>
+    <h1>X Sentiment Dashboard</h1>
+    <div class="subtitle">AI Agents & Tech Sentiment Tracker</div>
+  </div>
+  <div class="updated">Last updated: 2026-03-22 01:15 UTC</div>
 </div>
-<div class="kpi-row">
-<div class="kpi"><div class="value">38</div><div class="label">Posts Tracked</div></div>
-<div class="kpi"><div class="value">65.6K</div><div class="label">Total Likes</div></div>
-<div class="kpi"><div class="value">16.2M</div><div class="label">Total Views</div></div>
-<div class="kpi"><div class="value">11.0K</div><div class="label">Total Reposts</div></div>
-<div class="kpi"><div class="value" style="color:#3fb950">4</div><div class="label">Positive</div></div>
-<div class="kpi"><div class="value" style="color:#f85149">4</div><div class="label">Negative</div></div>
-<div class="kpi"><div class="value">30</div><div class="label">Neutral</div></div>
-</div>
-<div class="tabs">
-<div class="tab active" onclick="showLayer('agents')">AI Agents</div>
-<div class="tab" onclick="showLayer('crypto')">Crypto AI Agents</div>
-<div class="tab" onclick="showLayer('xrp')">XRP / Ripple / XRPL</div>
-<div class="tab" onclick="showLayer('singularity')">AI Singularity / AGI</div>
-<div class="tab" onclick="showLayer('local_ai')">Local AI / On-Device</div>
-<div class="tab" onclick="showLayer('indie_saas')">Indie SaaS / Solo Founder</div>
-<div class="tab" onclick="showLayer('pm_ai')">PM AI / AI Replacing Jobs</div>
-<div class="tab" onclick="showLayer('trending')">Trending</div>
-</div>
-<div class="layer-section active" id="layer-agents">
-<h2 style="color:#58a6ff;margin-bottom:16px">AI Agents</h2>
-<div class="grid">
-<div class="card"><h3>Sentiment Distribution</h3>
-    <div class="chart-container"><canvas id="chart-sent-agents"></canvas></div></div>
-<div class="card"><h3>Engagement Overview</h3>
-    <div class="chart-container"><canvas id="chart-eng-agents"></canvas></div></div>
-</div>
-<h3 style="color:#8b949e;margin-bottom:12px">Top Posts (6 tracked)</h3>
-<div class="tweet-card">
-        <div class="handle">@TFTC <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Jensen Huang: &quot;If that $500,000 engineer did not consume at least $250,000 worth of tokens, I am going to be deeply alarmed. This is no different than a chip designer who says &#x27;I&#x27;m just going to use paper and pencil. I don&#x27;t think I&#x27;m going to need any CAD tools.&#x27;&quot;</div>
-        <div class="metrics">
-        <span>💬 468</span>
-        <span>🔄 1.1K</span>
-        <span>❤️ 7.8K</span>
-        <span>👁️ 2.7M</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Nick Spisak <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">How to build a company run entirely by AI agents (free, open source, 5-minute setup). If you use Claude Code, OpenClaw, Codex, OpenCode, Cursor, or any other AI coding agent - Paperclip was built for you.</div>
-        <div class="metrics">
-        <span>💬 74</span>
-        <span>🔄 367</span>
-        <span>❤️ 4.1K</span>
-        <span>👁️ 1.0M</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Rohan Paul <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Chamath on how AI agents are making the &quot;10x engineer&quot; distinction disappear because the most efficient &quot;code paths&quot; are now obvious to everyone. Just as AI solved chess and removed the mystery of the best move, AI is doing the same for coding, making the process reductive and</div>
-        <div class="metrics">
-        <span>💬 267</span>
-        <span>🔄 200</span>
-        <span>❤️ 971</span>
-        <span>👁️ 778.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Kyle Chassé <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">NVIDIA just dropped NeMo Claw to make OpenClaw safe to run on your own machine. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</div>
-        <div class="metrics">
-        <span>💬 37</span>
-        <span>🔄 63</span>
-        <span>❤️ 753</span>
-        <span>👁️ 177.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@0xMarioNawfal <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</div>
-        <div class="metrics">
-        <span>💬 0</span>
-        <span>🔄 0</span>
-        <span>❤️ 0</span>
-        <span>👁️ 0</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Roan <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">I don&#x27;t usually share AI stuff because most of it is slop, but this is the most ignored.</div>
-        <div class="metrics">
-        <span>💬 0</span>
-        <span>🔄 0</span>
-        <span>❤️ 0</span>
-        <span>👁️ 0</span>
-        </div></div>
-</div>
-<div class="layer-section" id="layer-crypto">
-<h2 style="color:#58a6ff;margin-bottom:16px">Crypto AI Agents</h2>
-<div class="grid">
-<div class="card"><h3>Sentiment Distribution</h3>
-    <div class="chart-container"><canvas id="chart-sent-crypto"></canvas></div></div>
-<div class="card"><h3>Engagement Overview</h3>
-    <div class="chart-container"><canvas id="chart-eng-crypto"></canvas></div></div>
-</div>
-<h3 style="color:#8b949e;margin-bottom:12px">Top Posts (6 tracked)</h3>
-<div class="tweet-card">
-        <div class="handle">@Brian Armstrong <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Very soon there are going to be more AI agents than humans making transactions. They can&#x27;t open a bank account, but they can own a crypto wallet. Think about it.</div>
-        <div class="metrics">
-        <span>💬 2.2K</span>
-        <span>🔄 3.8K</span>
-        <span>❤️ 20.0K</span>
-        <span>👁️ 4.6M</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Simon Dedic <span class="sentiment-badge sentiment-positive">positive</span></div>
-        <div class="text">Congrats to everyone who held onto their crypto x AI coins. Billions of agents are about to come onchain to transact trillions of dollars. Imagine owning the rails.</div>
-        <div class="metrics">
-        <span>💬 91</span>
-        <span>🔄 44</span>
-        <span>❤️ 338</span>
-        <span>👁️ 44.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@0xMarioNawfal <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">AI AGENTS CAN NOW USE CRYPTO FULLY AUTONOMOUS. PAY, TRADE, BUILD APPS, ALL IN 1 PROMPT</div>
-        <div class="metrics">
-        <span>💬 50</span>
-        <span>🔄 45</span>
-        <span>❤️ 338</span>
-        <span>👁️ 44.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Nikil Viswanathan <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Deep dive on @CantonNetwork - crypto x AI agents future</div>
-        <div class="metrics">
-        <span>💬 18</span>
-        <span>🔄 15</span>
-        <span>❤️ 121</span>
-        <span>👁️ 27.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Nav Toor <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Claude Code, OpenAI, LangChain, CrewAI, AutoGen. Five frameworks. Five completely different ways to define an agent. Someone just built one format that works across all of them.</div>
-        <div class="metrics">
-        <span>💬 1</span>
-        <span>🔄 0</span>
-        <span>❤️ 3</span>
-        <span>👁️ 296</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Cointelegraph <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">CZ: AI agents will make 1M times more payments than humans, and they will use crypto.</div>
-        <div class="metrics">
-        <span>💬 0</span>
-        <span>🔄 0</span>
-        <span>❤️ 0</span>
-        <span>👁️ 0</span>
-        </div></div>
-</div>
-<div class="layer-section" id="layer-xrp">
-<h2 style="color:#58a6ff;margin-bottom:16px">XRP / Ripple / XRPL</h2>
-<div class="grid">
-<div class="card"><h3>Sentiment Distribution</h3>
-    <div class="chart-container"><canvas id="chart-sent-xrp"></canvas></div></div>
-<div class="card"><h3>Engagement Overview</h3>
-    <div class="chart-container"><canvas id="chart-eng-xrp"></canvas></div></div>
-</div>
-<h3 style="color:#8b949e;margin-bottom:12px">Top Posts (9 tracked)</h3>
-<div class="tweet-card">
-        <div class="handle">@Asheesh Birla <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">A commentary I&#x27;ve heard within the XRP community this month is some version of why is XRP price dislodged from adoption metrics? XRP is not yet a liquidity bridge at scale.</div>
-        <div class="metrics">
-        <span>💬 86</span>
-        <span>🔄 413</span>
-        <span>❤️ 1.7K</span>
-        <span>👁️ 55.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Versan Aljarrah <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Let me be very clear about what&#x27;s happening with crypto legislation right now. What you&#x27;re watching is not breaking news. The conclusion was always inevitable.</div>
-        <div class="metrics">
-        <span>💬 6</span>
-        <span>🔄 327</span>
-        <span>❤️ 1.6K</span>
-        <span>👁️ 55.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Time Traveler <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">When they remove XRP from exchanges, that would be a good time to activate your strategy.</div>
-        <div class="metrics">
-        <span>💬 77</span>
-        <span>🔄 37</span>
-        <span>❤️ 724</span>
-        <span>👁️ 0</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Eri ~ Carpe Diem <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Evernorth (@evernorthxrp), expected to be the largest publicly traded XRP DAT company, filed its S-4 today. Monster doc. 400+ pages.</div>
-        <div class="metrics">
-        <span>💬 34</span>
-        <span>🔄 150</span>
-        <span>❤️ 644</span>
-        <span>👁️ 23.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@No Regrets <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">I have gone down a rabbit hole on XRP. What I have gathered: 50,000 to become a millionaire. It&#x27;s not going to $589. The community is locked in.</div>
-        <div class="metrics">
-        <span>💬 112</span>
-        <span>🔄 27</span>
-        <span>❤️ 630</span>
-        <span>👁️ 172.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@David Schwartz <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Ripple dropping cross appeal, SEC expected to drop their appeal. Focusing on building the Internet of Value.</div>
-        <div class="metrics">
-        <span>💬 43</span>
-        <span>🔄 53</span>
-        <span>❤️ 584</span>
-        <span>👁️ 44.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Ripple Bull Winkle <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">A billion-dollar XRP move just happened. And almost nobody noticed.</div>
-        <div class="metrics">
-        <span>💬 20</span>
-        <span>🔄 24</span>
-        <span>❤️ 372</span>
-        <span>👁️ 44.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@AltcoinFox <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">XRP RUMOUR MILL. WE ARE 3 MONTHS AWAY FROM XRP SUPPLY SHOCK RESULTING IN A SPIKE TO $10 PER XRP</div>
-        <div class="metrics">
-        <span>💬 38</span>
-        <span>🔄 22</span>
-        <span>❤️ 272</span>
-        <span>👁️ 53.0K</span>
-        </div></div>
-</div>
-<div class="layer-section" id="layer-singularity">
-<h2 style="color:#58a6ff;margin-bottom:16px">AI Singularity / AGI</h2>
-<div class="grid">
-<div class="card"><h3>Sentiment Distribution</h3>
-    <div class="chart-container"><canvas id="chart-sent-singularity"></canvas></div></div>
-<div class="card"><h3>Engagement Overview</h3>
-    <div class="chart-container"><canvas id="chart-eng-singularity"></canvas></div></div>
-</div>
-<h3 style="color:#8b949e;margin-bottom:12px">Top Posts (5 tracked)</h3>
-<div class="tweet-card">
-        <div class="handle">@Polymarket <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">JUST IN: Renowned AI professor claims the universe is a simulation created to develop superintelligence - and will soon be turned off.</div>
-        <div class="metrics">
-        <span>💬 1.8K</span>
-        <span>🔄 2.1K</span>
-        <span>❤️ 11.0K</span>
-        <span>👁️ 4.1M</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Dustin <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Elon Musk just described the terminal state of the global financial system. Superintelligence won&#x27;t even recognize it. Musk: I think money will stop being relevant at some point.</div>
-        <div class="metrics">
-        <span>💬 174</span>
-        <span>🔄 595</span>
-        <span>❤️ 1.9K</span>
-        <span>👁️ 146.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Dustin <span class="sentiment-badge sentiment-positive">positive</span></div>
-        <div class="text">Perplexity CEO Aravind Srinivas just shattered the greatest illusion of the AI arms race. The entire market is waiting for a single, god-like superintelligence to win the entire board.</div>
-        <div class="metrics">
-        <span>💬 109</span>
-        <span>🔄 270</span>
-        <span>❤️ 1.5K</span>
-        <span>👁️ 385.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@The Curious Tales <span class="sentiment-badge sentiment-negative">negative</span></div>
-        <div class="text">BREAKING: AI professor argues the universe may be a simulated lab designed to engineer superintelligence - and it might be nearing shutdown.</div>
-        <div class="metrics">
-        <span>💬 88</span>
-        <span>🔄 58</span>
-        <span>❤️ 568</span>
-        <span>👁️ 76.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Dustin <span class="sentiment-badge sentiment-negative">negative</span></div>
-        <div class="text">Palantir CEO Alex Karp just delivered the brutal, unvarnished truth about the global AI arms race. The political class is terrified of superintelligence and begging for a regulatory pause.</div>
-        <div class="metrics">
-        <span>💬 0</span>
-        <span>🔄 0</span>
-        <span>❤️ 0</span>
-        <span>👁️ 0</span>
-        </div></div>
-</div>
-<div class="layer-section" id="layer-local_ai">
-<h2 style="color:#58a6ff;margin-bottom:16px">Local AI / On-Device</h2>
-<div class="grid">
-<div class="card"><h3>Sentiment Distribution</h3>
-    <div class="chart-container"><canvas id="chart-sent-local_ai"></canvas></div></div>
-<div class="card"><h3>Engagement Overview</h3>
-    <div class="chart-container"><canvas id="chart-eng-local_ai"></canvas></div></div>
-</div>
-<h3 style="color:#8b949e;margin-bottom:12px">Top Posts (5 tracked)</h3>
-<div class="tweet-card">
-        <div class="handle">@0xMarioNawfal <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE. It keeps private files off the cloud, runs fully offline, and adds the security layer local AI agents were missing.</div>
-        <div class="metrics">
-        <span>💬 93</span>
-        <span>🔄 186</span>
-        <span>❤️ 1.9K</span>
-        <span>👁️ 215.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Julian Goldie SEO <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">STOP using ChatGPT, Claude, Gemini and others. Run local AI with Ollama.</div>
-        <div class="metrics">
-        <span>💬 93</span>
-        <span>🔄 186</span>
-        <span>❤️ 1.9K</span>
-        <span>👁️ 215.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Rohan Paul <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Google just dropped AI agents into the planet&#x27;s biggest application, Google Map. Launched today across the United States and India.</div>
-        <div class="metrics">
-        <span>💬 23</span>
-        <span>🔄 64</span>
-        <span>❤️ 282</span>
-        <span>👁️ 63.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Bitcoin News <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">NEW: Project NOMAD, a free open-source offline server, lets users run Wikipedia, AI models, maps, and full education platforms entirely without internet.</div>
-        <div class="metrics">
-        <span>💬 7</span>
-        <span>🔄 20</span>
-        <span>❤️ 101</span>
-        <span>👁️ 0</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Miles Deutscher <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">OpenClaw is still one of the biggest untapped opportunities in AI right now.</div>
-        <div class="metrics">
-        <span>💬 0</span>
-        <span>🔄 0</span>
-        <span>❤️ 0</span>
-        <span>👁️ 0</span>
-        </div></div>
-</div>
-<div class="layer-section" id="layer-indie_saas">
-<h2 style="color:#58a6ff;margin-bottom:16px">Indie SaaS / Solo Founder</h2>
-<div class="grid">
-<div class="card"><h3>Sentiment Distribution</h3>
-    <div class="chart-container"><canvas id="chart-sent-indie_saas"></canvas></div></div>
-<div class="card"><h3>Engagement Overview</h3>
-    <div class="chart-container"><canvas id="chart-eng-indie_saas"></canvas></div></div>
-</div>
-<h3 style="color:#8b949e;margin-bottom:12px">Top Posts (4 tracked)</h3>
-<div class="tweet-card">
-        <div class="handle">@Linus Ekenstam <span class="sentiment-badge sentiment-positive">positive</span></div>
-        <div class="text">Pay attention. Ben is on the pathway to become the first billion dollar solo founder. In less than 2 months he has grown from 0-4.4M in ARR. This is absolutely insane.</div>
-        <div class="metrics">
-        <span>💬 70</span>
-        <span>🔄 105</span>
-        <span>❤️ 1.6K</span>
-        <span>👁️ 598.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Austin Walker <span class="sentiment-badge sentiment-positive">positive</span></div>
-        <div class="text">Being a solo founder is harder than i thought. I&#x27;m looking for a co-founder. The best companies are built out of deep collaboration and shared ownership.</div>
-        <div class="metrics">
-        <span>💬 92</span>
-        <span>🔄 24</span>
-        <span>❤️ 305</span>
-        <span>👁️ 25.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@aditii <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">2 co founder and solo dev. What they do?</div>
-        <div class="metrics">
-        <span>💬 1</span>
-        <span>🔄 0</span>
-        <span>❤️ 2</span>
-        <span>👁️ 382</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Rob Hoffman <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">In Jan we launched our bootstrapped SaaS to the public using a webinar. We made $52,184 in under 2 hours. 3 weeks of promotion on LinkedIn and X.</div>
-        <div class="metrics">
-        <span>💬 0</span>
-        <span>🔄 0</span>
-        <span>❤️ 0</span>
-        <span>👁️ 0</span>
-        </div></div>
-</div>
-<div class="layer-section" id="layer-pm_ai">
-<h2 style="color:#58a6ff;margin-bottom:16px">PM AI / AI Replacing Jobs</h2>
-<div class="grid">
-<div class="card"><h3>Sentiment Distribution</h3>
-    <div class="chart-container"><canvas id="chart-sent-pm_ai"></canvas></div></div>
-<div class="card"><h3>Engagement Overview</h3>
-    <div class="chart-container"><canvas id="chart-eng-pm_ai"></canvas></div></div>
-</div>
-<h3 style="color:#8b949e;margin-bottom:12px">Top Posts (3 tracked)</h3>
-<div class="tweet-card">
-        <div class="handle">@The Rundown AI <span class="sentiment-badge sentiment-negative">negative</span></div>
-        <div class="text">Anthropic just studied which jobs AI can theoretically replace vs. which ones it&#x27;s actually automating right now. Computer &amp; math: 94% exposed. Legal: ~90%. Management, architecture, arts &amp; media: all high.</div>
-        <div class="metrics">
-        <span>💬 182</span>
-        <span>🔄 623</span>
-        <span>❤️ 3.1K</span>
-        <span>👁️ 407.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Dustin <span class="sentiment-badge sentiment-neutral">neutral</span></div>
-        <div class="text">Bret Taylor, former co-CEO of Salesforce and chair of OpenAI, just redefined the unit of productivity. It&#x27;s not a person. It&#x27;s a process.</div>
-        <div class="metrics">
-        <span>💬 30</span>
-        <span>🔄 95</span>
-        <span>❤️ 478</span>
-        <span>👁️ 100.0K</span>
-        </div></div>
-<div class="tweet-card">
-        <div class="handle">@Jon Hernandez <span class="sentiment-badge sentiment-negative">negative</span></div>
-        <div class="text">Dario Amodei, CEO of Anthropic, says AI will disrupt jobs faster and broader than anything before. Some roles, even software engineers, may shrink as models automate entire workflows.</div>
-        <div class="metrics">
-        <span>💬 0</span>
-        <span>🔄 0</span>
-        <span>❤️ 0</span>
-        <span>👁️ 0</span>
-        </div></div>
-</div>
-<div class="layer-section" id="layer-trending">
-<h2 style="color:#58a6ff;margin-bottom:16px">Trending Topics</h2>
-<div class="grid">
-<div class="card"><h3>Today's News</h3>
-<div class="news-item">
-    <div class="headline">Video Claims Billionaires Dodge Taxes with Ugly Art Donations</div>
-    <div class="meta">2.1K posts</div></div>
-<div class="news-item">
-    <div class="headline">OpenClaw Tops GitHub Stars as Hottest AI Agent Framework</div>
-    <div class="meta">3.2K posts</div></div>
-<div class="news-item">
-    <div class="headline">Iran&#x27;s Long-Range Missiles Fail at Diego Garcia, Reach Toward Europe</div>
-    <div class="meta">889K posts</div></div>
-<div class="news-item">
-    <div class="headline">Magnitude 6.7 Earthquake Strikes Northern Mid-Atlantic Ridge Amid Spike in Earth&#x27;s Seismic Activity</div>
-    <div class="meta">899 posts</div></div>
-<div class="news-item">
-    <div class="headline">United States Launches Operation Epic Fury Striking Over 8,000 Iranian Military Targets</div>
-    <div class="meta">16.7K posts</div></div>
-<div class="news-item">
-    <div class="headline">#AdamesWilliams</div>
-    <div class="meta"> posts</div></div>
-<div class="news-item">
-    <div class="headline">$FUZZY</div>
-    <div class="meta"> posts</div></div>
-<div class="news-item">
-    <div class="headline">David Schwartz</div>
-    <div class="meta"> posts</div></div>
-</div>
-<div class="card"><h3>Top 30 Trending</h3><ul class="trending-list">
-<li><span class="rank">1</span>
-    <span class="topic">#SNLUK</span>
-    <span class="cat">Trending in United Kingdom</span></li>
-<li><span class="rank">2</span>
-    <span class="topic">#UFCLondon</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">3</span>
-    <span class="topic">chappell</span>
-    <span class="cat">Trending in United Kingdom</span></li>
-<li><span class="rank">4</span>
-    <span class="topic">#lufc</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">5</span>
-    <span class="topic">Farke</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">6</span>
-    <span class="topic">Movsar</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">7</span>
-    <span class="topic">Everton</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">8</span>
-    <span class="topic">Josh Kerr</span>
-    <span class="cat">Trending</span></li>
-<li><span class="rank">9</span>
-    <span class="topic">Gnonto</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">10</span>
-    <span class="topic">#MOTD</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">11</span>
-    <span class="topic">Jack Shep</span>
-    <span class="cat">Trending in United Kingdom</span></li>
-<li><span class="rank">12</span>
-    <span class="topic">Luke Riley</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">13</span>
-    <span class="topic">#LiddardDenny</span>
-    <span class="cat">Trending in United Kingdom</span></li>
-<li><span class="rank">14</span>
-    <span class="topic">Mueller</span>
-    <span class="cat">Politics</span></li>
-<li><span class="rank">15</span>
-    <span class="topic">Dimona</span>
-    <span class="cat">Only on X</span></li>
-<li><span class="rank">16</span>
-    <span class="topic">Volk</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">17</span>
-    <span class="topic">Maresca</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">18</span>
-    <span class="topic">byers</span>
-    <span class="cat">Trending in United Kingdom</span></li>
-<li><span class="rank">19</span>
-    <span class="topic">Okafor</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">20</span>
-    <span class="topic">$BEAR</span>
-    <span class="cat">Trending</span></li>
-<li><span class="rank">21</span>
-    <span class="topic">Patterson</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">22</span>
-    <span class="topic">Wet Leg</span>
-    <span class="cat">Trending in United Kingdom</span></li>
-<li><span class="rank">23</span>
-    <span class="topic">Aaronson</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">24</span>
-    <span class="topic">Wolves and Burnley</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">25</span>
-    <span class="topic">Dan James</span>
-    <span class="cat">Premier League</span></li>
-<li><span class="rank">26</span>
-    <span class="topic">Tanaka</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">27</span>
-    <span class="topic">Keith Andrews</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">28</span>
-    <span class="topic">Mason Jones</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">29</span>
-    <span class="topic">Ndiaye</span>
-    <span class="cat">Sports</span></li>
-<li><span class="rank">30</span>
-    <span class="topic">Sanchez</span>
-    <span class="cat">Sports</span></li>
-</ul></div>
-</div></div>
-<script>
+<div class="container">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+("�
+const trendingData = [{"topic": "SpaceX TERAFAB Launch", "category": "Live on X", "post_count": "68800", "scraped_at": "2026-03-22T01:15:35.046417"}, {"topic": "OpenClaw Tops GitHub Stars as Hottest AI Agent Framework", "category": "Other", "post_count": "3440", "scraped_at": "2026-03-22T01:15:35.045307"}, {"topic": "BOON", "category": "Trending in United Kingdom", "post_count": "", "scraped_at": "2026-03-22T01:15:35.044117"}, {"topic": "Amad", "category": "Sports", "post_count": "", "scraped_at": "2026-03-22T01:15:35.043102"}, {"topic": "George Fouracres", "category": "Trending in United Kingdom", "post_count": "", "scraped_at": "2026-03-22T01:15:35.039836"}, {"topic": "Join Free Calls", "category": "Business and finance", "post_count": "", "scraped_at": "2026-03-22T01:15:35.036431"}, {"topic": "#SNLUK", "category": "Trending in United Kingdom", "post_count": "", "scraped_at": "2026-03-22T01:15:35.034296"}, {"topic": "Josh Kerr", "category": "Trending", "post_count": "", "scraped_at": "2026-03-22T01:15:35.032725"}, {"topic": "Viral Schumann Resonance Spike Claim Debunked Amid Real Space Weather", "category": "Other", "post_count": "1700", "scraped_at": "2026-03-22T01:15:35.030023"}, {"topic": "Joe Rogan Speculates Netanyahu Might Be Dead on Podcast", "category": "News", "post_count": "3154", "scraped_at": "2026-03-22T01:15:35.027795"}, {"topic": "Claude Code Transforms Coding with .claude Folders and Skills", "category": "News", "post_count": "119", "scraped_at": "2026-03-22T01:15:35.020953"}];
 
-function showLayer(id) {
-  document.querySelectorAll('.layer-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('layer-' + id).classList.add('active');
-  event.target.classList.add('active');
+// Render stats cards
+const grid = document.getElementById('statsGrid');
+statsData.forEach(s => {
+  const total = s.positive + s.negative + s.neutral;
+  const pp = total ? (s.positive/total*100).toFixed(0) : 0;
+  const np = total ? (s.negative/total*100).toFixed(0) : 0;
+  const nup = total ? (s.neutral/total*100).toFixed(0) : 0;
+  grid.innerHTML += `
+    <div class="card">
+      <h3>${s.name}</h3>
+      <div class="stat-value">${s.total}</div>
+      <div class="stat-label">posts tracked</div>
+      <div class="sentiment-bar">
+        <div class="pos" style="width:${pp}%"></div>
+        <div class="neu" style="width:${nup}%"></div>
+        <div class="neg" style="width:${np}%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px">
+        <span style="color:#22c55e">${pp}% positive</span>
+        <span style="color:#6666aa">${nup}% neutral</span>
+        <span style="color:#ef4444">${np}% negative</span>
+      </div>
+      <div class="stat-label">Avg sentiment: ${s.avg_score.toFixed(3)}</div>
+    </div>`;
+});
+
+// Chart
+if(statsData.length > 0) {
+  const ctx = document.getElementById('sentimentChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: statsData.map(s => s.name),
+      datasets: [
+        { label: 'Positive', data: statsData.map(s => s.positive), backgroundColor: '#22c55e' },
+        { label: 'Neutral', data: statsData.map(s => s.neutral), backgroundColor: '#6666aa' },
+        { label: 'Negative', data: statsData.map(s => s.negative), backgroundColor: '#ef4444' }
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: { stacked: true, ticks: { color: '#8888aa' }, grid: { color: '#1a1a3e' } },
+        y: { stacked: true, ticks: { color: '#8888aa' }, grid: { color: '#1a1a3e' } }
+      },
+      plugins: { legend: { labels: { color: '#ccc' } } }
+    }
+  });
 }
 
+// Trending
+const tl = document.getElementById('trendingList');
+if(trendingData.length === 0) {
+  tl.innerHTML = '<div style="color:#6666aa">No trending data yet</div>';
+} else {
+  trendingData.forEach(t => {
+    tl.innerHTML += `<div class="trending-item"><div class="topic">${t.topic}</div><div class="cat">${t.category} ${t.post_count ? '· ' + t.post_count + ' posts' : ''}</div></div>`;
+  });
+}
 
-new Chart(document.getElementById('chart-sent-agents'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Positive', 'Negative', 'Neutral'],
-    datasets: [{data: [0, 0, 6],
-    backgroundColor: ['#3fb950', '#f85149', '#58a6ff']}]
-  },
-  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
+// Tweets with tabs
+const tabs = document.getElementById('layerTabs');
+const tweetList = document.getElementById('tweetList');
+const layers = ['all', ...new Set(postsData.map(p => p.layer))];
+let activeLayer = 'all';
 
-new Chart(document.getElementById('chart-eng-agents'), {
-  type: 'bar',
-  data: {
-    labels: ["TFTC", "Nick Spisak", "Rohan Paul", "Kyle Chass\u00e9", "0xMarioNawfal"],
-    datasets: [
-      {label: 'Likes', data: [7800, 4100, 971, 753, 0], backgroundColor: '#f85149'},
-      {label: 'Reposts', data: [1100, 367, 200, 63, 0], backgroundColor: '#58a6ff'}
-    ]
-  },
-  options: {responsive:true, maintainAspectRatio:false, scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e'}}},
-  plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
+function renderTabs() {
+  tabs.innerHTML = '';
+  layers.forEach(l => {
+    const cls = l === activeLayer ? 'tab active' : 'tab';
+    tabs.innerHTML += `<div class="${cls}" onclick="filterLayer('${l}')">${l === 'all' ? 'All' : l}</div>`;
+  });
+}
 
-new Chart(document.getElementById('chart-sent-crypto'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Positive', 'Negative', 'Neutral'],
-    datasets: [{data: [1, 0, 5],
-    backgroundColor: ['#3fb950', '#f85149', '#58a6ff']}]
-  },
-  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
+function renderTweets() {
+  const filtered = activeLayer === 'all' ? postsData : postsData.filter(p => p.layer === activeLayer);
+  tweetList.innerHTML = '';
+  filtered.slice(0, 100).forEach(p => {
+    tweetList.innerHTML += `
+      <div class="tweet">
+        <div class="meta">
+          <span class="handle">${p.handle}</span>
+          <span><span class="layer-tag">${p.layer}</span> <span class="badge ${p.sentiment}">${p.sentiment}</span></span>
+        </div>
+        <div class="text">${p.text}</div>
+        <div class="metrics">
+          <span>Replies: ${p.replies}</span>
+          <span>Reposts: ${p.reposts}</span>
+          <span>Likes: ${p.likes}</span>
+          <span>Views: ${p.views}</span>
+          <span>${p.date || ''}</span>
+        </div>
+      </div>`;
+  });
+}
 
-new Chart(document.getElementById('chart-eng-crypto'), {
-  type: 'bar',
-  data: {
-    labels: ["Brian Armstrong", "Simon Dedic", "0xMarioNawfal", "Nikil Viswanath", "Nav Toor"],
-    datasets: [
-      {label: 'Likes', data: [20000, 338, 338, 121, 3], backgroundColor: '#f85149'},
-      {label: 'Reposts', data: [3800, 44, 45, 15, 0], backgroundColor: '#58a6ff'}
-    ]
-  },
-  options: {responsive:true, maintainAspectRatio:false, scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e'}}},
-  plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
+window.filterLayer = function(l) {
+  activeLayer = l;
+  renderTabs();
+  renderTweets();
+};
 
-new Chart(document.getElementById('chart-sent-xrp'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Positive', 'Negative', 'Neutral'],
-    datasets: [{data: [0, 0, 9],
-    backgroundColor: ['#3fb950', '#f85149', '#58a6ff']}]
-  },
-  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-
-new Chart(document.getElementById('chart-eng-xrp'), {
-  type: 'bar',
-  data: {
-    labels: ["Asheesh Birla", "Versan Aljarrah", "Time Traveler", "Eri ~ Carpe Die", "No Regrets"],
-    datasets: [
-      {label: 'Likes', data: [1700, 1600, 724, 644, 630], backgroundColor: '#f85149'},
-      {label: 'Reposts', data: [413, 327, 37, 150, 27], backgroundColor: '#58a6ff'}
-    ]
-  },
-  options: {responsive:true, maintainAspectRatio:false, scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e'}}},
-  plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-
-new Chart(document.getElementById('chart-sent-singularity'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Positive', 'Negative', 'Neutral'],
-    datasets: [{data: [1, 2, 2],
-    backgroundColor: ['#3fb950', '#f85149', '#58a6ff']}]
-  },
-  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-
-new Chart(document.getElementById('chart-eng-singularity'), {
-  type: 'bar',
-  data: {
-    labels: ["Polymarket", "Dustin", "Dustin", "The Curious Tal", "Dustin"],
-    datasets: [
-      {label: 'Likes', data: [11000, 1900, 1500, 568, 0], backgroundColor: '#f85149'},
-      {label: 'Reposts', data: [2100, 595, 270, 58, 0], backgroundColor: '#58a6ff'}
-    ]
-  },
-  options: {responsive:true, maintainAspectRatio:false, scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e'}}},
-  plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-
-new Chart(document.getElementById('chart-sent-local_ai'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Positive', 'Negative', 'Neutral'],
-    datasets: [{data: [0, 0, 5],
-    backgroundColor: ['#3fb950', '#f85149', '#58a6ff']}]
-  },
-  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-
-new Chart(document.getElementById('chart-eng-local_ai'), {
-  type: 'bar',
-  data: {
-    labels: ["0xMarioNawfal", "Julian Goldie S", "Rohan Paul", "Bitcoin News", "Miles Deutscher"],
-    datasets: [
-      {label: 'Likes', data: [1900, 1900, 282, 101, 0], backgroundColor: '#f85149'},
-      {label: 'Reposts', data: [186, 186, 64, 20, 0], backgroundColor: '#58a6ff'}
-    ]
-  },
-  options: {responsive:true, maintainAspectRatio:false, scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e'}}},
-  plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-
-new Chart(document.getElementById('chart-sent-indie_saas'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Positive', 'Negative', 'Neutral'],
-    datasets: [{data: [2, 0, 2],
-    backgroundColor: ['#3fb950', '#f85149', '#58a6ff']}]
-  },
-  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-
-new Chart(document.getElementById('chart-eng-indie_saas'), {
-  type: 'bar',
-  data: {
-    labels: ["Linus Ekenstam", "Austin Walker", "aditii", "Rob Hoffman"],
-    datasets: [
-      {label: 'Likes', data: [1600, 305, 2, 0], backgroundColor: '#f85149'},
-      {label: 'Reposts', data: [105, 24, 0, 0], backgroundColor: '#58a6ff'}
-    ]
-  },
-  options: {responsive:true, maintainAspectRatio:false, scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e'}}},
-  plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-
-new Chart(document.getElementById('chart-sent-pm_ai'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Positive', 'Negative', 'Neutral'],
-    datasets: [{data: [0, 2, 1],
-    backgroundColor: ['#3fb950', '#f85149', '#58a6ff']}]
-  },
-  options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-
-new Chart(document.getElementById('chart-eng-pm_ai'), {
-  type: 'bar',
-  data: {
-    labels: ["The Rundown AI", "Dustin", "Jon Hernandez"],
-    datasets: [
-      {label: 'Likes', data: [3100, 478, 0], backgroundColor: '#f85149'},
-      {label: 'Reposts', data: [623, 95, 0], backgroundColor: '#58a6ff'}
-    ]
-  },
-  options: {responsive:true, maintainAspectRatio:false, scales:{x:{ticks:{color:'#8b949e'}},y:{ticks:{color:'#8b949e'}}},
-  plugins:{legend:{labels:{color:'#8b949e'}}}}
-});
-</script></body></html>
+renderTabs();
+renderTweets();
+</script>
+</body>
+</html>
