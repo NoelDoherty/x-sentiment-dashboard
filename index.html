@@ -1,821 +1,125 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>X Sentiment Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X Sentiment Dashboard - AI &amp; Tech</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:20px;max-width:1200px;margin:0 auto}
-.header{text-align:center;padding:24px 0;border-bottom:1px solid #1e293b;margin-bottom:24px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:24px 0}
-.stat{background:#1e293b;border-radius:12px;padding:20px;text-align:center}
-.stat .num{font-size:32px;font-weight:700}
-.stat .label{color:#94a3b8;font-size:13px;margin-top:4px}
-.chart-container{background:#1e293b;border-radius:12px;padding:20px;margin:24px 0}
-.trending{background:#1e293b;border-radius:12px;padding:20px;margin:24px 0}
-</style></head><body>
-<div class="header">
-<h1 style="font-size:28px">📊 X Sentiment Dashboard</h1>
-<p style="color:#94a3b8;margin-top:8px">Last updated: 2026-03-23 05:18:21 UTC</p>
-<p style="color:#64748b;font-size:12px;margin-top:4px">Tracking AI agents, crypto, XRP, singularity, local AI, indie SaaS & PM AI</p>
-</div>
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px;max-width:1200px;margin:0 auto}
+h1{text-align:center;font-size:1.8em;margin-bottom:5px;color:#f1f5f9;letter-spacing:-0.5px}
+h2{font-size:1.3em;margin:25px 0 12px;color:#cbd5e1}
+.subtitle{text-align:center;color:#64748b;margin-bottom:25px;font-size:.9em}
+.stats{display:flex;gap:15px;justify-content:center;flex-wrap:wrap;margin:20px 0}
+.stat{background:#1e293b;border-radius:12px;padding:18px 28px;text-align:center;min-width:130px;border:1px solid #334155}
+.stat .num{font-size:2.2em;font-weight:700}
+.stat .label{font-size:.8em;color:#94a3b8;margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+.pos{color:#22c55e}.neg{color:#ef4444}.neu{color:#94a3b8}
+.chart-container{background:#1e293b;border-radius:12px;padding:20px;margin:25px auto;max-width:800px;border:1px solid #334155}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin:15px 0}
+.layer-card{background:#1e293b;border-radius:12px;padding:18px;border:1px solid #334155}
+.layer-card h3{color:#60a5fa;margin-bottom:8px;font-size:1em}
+.layer-stats{margin-bottom:10px;font-size:1.1em;font-weight:600}
+.top-tweet{color:#94a3b8;font-size:.82em;line-height:1.4;font-style:italic}
+.trend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:10px 0}
+.trend-item{background:#1e293b;border-radius:8px;padding:10px 14px;border:1px solid #334155;display:flex;align-items:center;gap:10px}
+.trend-rank{color:#60a5fa;font-weight:700;font-size:.9em;min-width:22px}
+.trend-name{color:#e2e8f0;font-size:.88em}
+.footer{text-align:center;color:#475569;margin-top:30px;padding:15px;font-size:.8em;border-top:1px solid #1e293b}
+</style>
+</head>
+<body>
+<h1>X Sentiment Dashboard</h1>
+<p class="subtitle">Last updated: 2026-03-23 06:38 UTC &bull; 93 posts across 7 layers + 30 trending topics</p>
+
 <div class="stats">
-<div class="stat"><div class="num" style="color:#60a5fa">104</div><div class="label">Total Posts</div></div>
-<div class="stat"><div class="num" style="color:#22c55e">17</div><div class="label">Positive</div></div>
-<div class="stat"><div class="num" style="color:#ef4444">8</div><div class="label">Negative</div></div>
-<div class="stat"><div class="num" style="color:#64748b">79</div><div class="label">Neutral</div></div>
+  <div class="stat"><div class="num pos">7</div><div class="label">Positive</div></div>
+  <div class="stat"><div class="num neg">12</div><div class="label">Negative</div></div>
+  <div class="stat"><div class="num neu">74</div><div class="label">Neutral</div></div>
+  <div class="stat"><div class="num" style="color:#60a5fa">93</div><div class="label">Total Posts</div></div>
+  <div class="stat"><div class="num" style="color:#a78bfa">30</div><div class="label">Trending</div></div>
 </div>
+
 <div class="chart-container">
-<canvas id="sentChart" height="100"></canvas>
+  <canvas id="sentChart"></canvas>
 </div>
-<div class="trending">
-<h2 style="color:#f1f5f9;margin-bottom:12px">🔥 Trending Now on X</h2>
-<div><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">1. Kepa</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">2. Easter</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">3. #ARSMCI</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">4. Spurs</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">5. Sunderland</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">6. Howe</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">7. #SAFC</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">8. Saka</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">9. #CarabaoCupFinal</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">10. chappell</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">11. Diego Garcia</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">12. West Ham</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">13. Cherki</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">14. Nico O&#x27;Reilly</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">15. Trossard</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">16. Havertz</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">17. Cadbury</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">18. #NEWSUN</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">19. Golders Green</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">20. #SNLUK</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">21. John Terry</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">22. Brobbey</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">23. no eze</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">24. Trafford</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">25. Hincapie</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">26. Liverpool</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">27. Chelsea</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">28. Steve Reed</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">29. Forest</span><span style="display:inline-block;background:#1e293b;color:#e2e8f0;padding:6px 14px;border-radius:20px;margin:4px;font-size:13px;border:1px solid #334155">30. Cuba</span></div>
+
+<h2>Layer Breakdown</h2>
+<div class="grid"><div class="layer-card">
+      <h3>AI Agents</h3>
+      <div class="layer-stats">
+        <span class="pos">1+</span> <span class="neg">2-</span> <span class="neu">8~</span> <span style="color:#60a5fa">(11)</span>
+      </div>
+      <div class="top-tweet">@Rohan Paul: Chamath on how AI agents are making the 10x engineer distinction disappear</div>
+    </div><div class="layer-card">
+      <h3>Crypto AI</h3>
+      <div class="layer-stats">
+        <span class="pos">1+</span> <span class="neg">1-</span> <span class="neu">12~</span> <span style="color:#60a5fa">(14)</span>
+      </div>
+      <div class="top-tweet">@Brian Armstrong: Very soon there are going to be more AI agents than humans making transactions</div>
+    </div><div class="layer-card">
+      <h3>XRP/Ripple</h3>
+      <div class="layer-stats">
+        <span class="pos">2+</span> <span class="neg">1-</span> <span class="neu">15~</span> <span style="color:#60a5fa">(18)</span>
+      </div>
+      <div class="top-tweet">@James Seyffart: The XRP ETFs have actually held up pretty well despite the massive pullback</div>
+    </div><div class="layer-card">
+      <h3>AGI/Singularity</h3>
+      <div class="layer-stats">
+        <span class="pos">1+</span> <span class="neg">1-</span> <span class="neu">11~</span> <span style="color:#60a5fa">(13)</span>
+      </div>
+      <div class="top-tweet">@Polymarket: JUST IN: Renowned AI professor claims the universe is a simulation</div>
+    </div><div class="layer-card">
+      <h3>Local AI</h3>
+      <div class="layer-stats">
+        <span class="pos">1+</span> <span class="neg">0-</span> <span class="neu">10~</span> <span style="color:#60a5fa">(11)</span>
+      </div>
+      <div class="top-tweet">@God of Prompt: BREAKING: Someone just open-sourced a full offline survival computer with AI</div>
+    </div><div class="layer-card">
+      <h3>Indie SaaS</h3>
+      <div class="layer-stats">
+        <span class="pos">1+</span> <span class="neg">1-</span> <span class="neu">12~</span> <span style="color:#60a5fa">(14)</span>
+      </div>
+      <div class="top-tweet">@The Startup Ideas Podcast: 1-person companies are coming. One human. A team of digital employees</div>
+    </div><div class="layer-card">
+      <h3>PM/AI Jobs</h3>
+      <div class="layer-stats">
+        <span class="pos">0+</span> <span class="neg">6-</span> <span class="neu">6~</span> <span style="color:#60a5fa">(12)</span>
+      </div>
+      <div class="top-tweet">@Dustin: Bret Taylor, former co-CEO of Salesforce and chair of OpenAI, just redefined productivity</div>
+    </div></div>
+
+<h2>Trending Topics</h2>
+<div class="trend-grid"><div class="trend-item"><span class="trend-rank">1</span><span class="trend-name">Kepa</span></div><div class="trend-item"><span class="trend-rank">2</span><span class="trend-name">Easter</span></div><div class="trend-item"><span class="trend-rank">3</span><span class="trend-name">#ARSMCI</span></div><div class="trend-item"><span class="trend-rank">4</span><span class="trend-name">Golders Green</span></div><div class="trend-item"><span class="trend-rank">5</span><span class="trend-name">Spurs</span></div><div class="trend-item"><span class="trend-rank">6</span><span class="trend-name">Sunderland</span></div><div class="trend-item"><span class="trend-rank">7</span><span class="trend-name">Howe</span></div><div class="trend-item"><span class="trend-rank">8</span><span class="trend-name">#CarabaoCupFinal</span></div><div class="trend-item"><span class="trend-rank">9</span><span class="trend-name">Saka</span></div><div class="trend-item"><span class="trend-rank">10</span><span class="trend-name">#SAFC</span></div><div class="trend-item"><span class="trend-rank">11</span><span class="trend-name">#NUFC</span></div><div class="trend-item"><span class="trend-rank">12</span><span class="trend-name">Diego Garcia</span></div><div class="trend-item"><span class="trend-rank">13</span><span class="trend-name">chappell</span></div><div class="trend-item"><span class="trend-rank">14</span><span class="trend-name">Cherki</span></div><div class="trend-item"><span class="trend-rank">15</span><span class="trend-name">West Ham</span></div><div class="trend-item"><span class="trend-rank">16</span><span class="trend-name">Cadbury</span></div><div class="trend-item"><span class="trend-rank">17</span><span class="trend-name">Havertz</span></div><div class="trend-item"><span class="trend-rank">18</span><span class="trend-name">#NEWSUN</span></div><div class="trend-item"><span class="trend-rank">19</span><span class="trend-name">Nico O'Reilly</span></div><div class="trend-item"><span class="trend-rank">20</span><span class="trend-name">Trossard</span></div><div class="trend-item"><span class="trend-rank">21</span><span class="trend-name">John Terry</span></div><div class="trend-item"><span class="trend-rank">22</span><span class="trend-name">Brobbey</span></div><div class="trend-item"><span class="trend-rank">23</span><span class="trend-name">NO EZE</span></div><div class="trend-item"><span class="trend-rank">24</span><span class="trend-name">Trafford</span></div><div class="trend-item"><span class="trend-rank">25</span><span class="trend-name">Hincapie</span></div><div class="trend-item"><span class="trend-rank">26</span><span class="trend-name">Chelsea</span></div><div class="trend-item"><span class="trend-rank">27</span><span class="trend-name">Steve Reed</span></div><div class="trend-item"><span class="trend-rank">28</span><span class="trend-name">Cuba</span></div><div class="trend-item"><span class="trend-rank">29</span><span class="trend-name">Saliba</span></div><div class="trend-item"><span class="trend-rank">30</span><span class="trend-name">Forest</span></div></div>
+
+<div class="footer">
+  Noel Doherty's AI &amp; Tech Sentiment Tracker &bull; Auto-updated hourly via Claude Cowork
 </div>
-<div style="margin-bottom:32px">
-    <h2 style="color:#f1f5f9;border-bottom:1px solid #334155;padding-bottom:8px;display:flex;justify-content:space-between">
-      AI Agents
-      <span style="font-size:14px;color:#94a3b8">12 posts | +2 -1 ~9</span>
-    </h2>
-    <div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Rohan Paul</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 19</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Chamath on how AI agents are making the &quot;10x engineer&quot; distinction disappear</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️994 👁808K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Avid</strong>
-        <span style="color:#94a3b8;font-size:12px">15h</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">this founder replaced half his business using ai agents for &lt;$21</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️590 👁174K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Ejaaz</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 21</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">this interview with karpathy is amazing, shared so much alpha on where ai models, agents going</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.2K 👁215K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Kyle Chassé</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 18</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">NVIDIA JUST SOLVED THE AGENT TRUST PROBLEM - OpenShell dropped two days ago</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️754 👁178K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Roan</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 17</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">most insane thing I&#x27;ve read today. People are already building companies with AI agents</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️4.1K 👁1M | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #ef4444;background:rgba(239,68,68,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@TFTC</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 19</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Jensen Huang: If that $500,000 engineer did not consume at least $250,000 worth of tokens, I am going to be deeply alarmed</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️7.9K 👁2.8M | <span style="color:#ef4444">negative</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@0xMarioNawfal</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 17</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.9K 👁215K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Rohan Paul</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 13</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Google just dropped AI agents into the planet&#x27;s biggest application, Google Map</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️282 👁63K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Sukh Sroay</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 21</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Someone turned Claude Code into a full game development studio</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.8K 👁262K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Brian Armstrong</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 9</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Very soon there are going to be more AI agents than humans making payments</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️20K 👁4.6M | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Okara</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 16</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Today we&#x27;re introducing the world&#x27;s first AI CMO. Enter your brand and watch it work</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️27K 👁13M | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@0xMarioNawfal</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 16</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">These are the 5 fastest growing GitHub projects this month - all AI agents</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️604 👁95K | <span style="color:#64748b">neutral</span></div>
-    </div>
-  </div><div style="margin-bottom:32px">
-    <h2 style="color:#f1f5f9;border-bottom:1px solid #334155;padding-bottom:8px;display:flex;justify-content:space-between">
-      Crypto AI Agents
-      <span style="font-size:14px;color:#94a3b8">17 posts | +1 -2 ~14</span>
-    </h2>
-    <div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Brian Armstrong</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 9</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Very soon there are going to be more AI agents than humans making payments</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️20K 👁4.6M | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@0xMarioNawfal</strong>
-        <span style="color:#94a3b8;font-size:12px">Feb 27</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AI AGENTS CAN NOW USE CRYPTO FULLY AUTONOMOUS - PAY, TRADE</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️347 👁64K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Coinvo</strong>
-        <span style="color:#94a3b8;font-size:12px">Feb 21</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AI that trades, signs, and executes! Shade Agents, built by @NEARProtocol</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️66 👁22K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Simon Dedic</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 16</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Congrats to everyone who held onto their crypto x AI coins</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️338 👁45K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Miles Deutscher</strong>
-        <span style="color:#94a3b8;font-size:12px">Nov 13</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">This @HeyAnonai demo is exactly why I&#x27;m bullish on the future of crypto x AI agents</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️121 👁27K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Miles Deutscher</strong>
-        <span style="color:#94a3b8;font-size:12px">Oct 28</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">1. AI/Agents If you&#x27;ve been following me for a while, you&#x27;ll know how vocal I&#x27;ve been on AI</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️66 👁22K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Miles Deutscher</strong>
-        <span style="color:#94a3b8;font-size:12px">Jan 6</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The last 30 days in crypto: AI agents, then daylight</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️280 👁39K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Cointelegraph</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 9</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AI agents and crypto go hand in hand, but could a barrier emerge?</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️83 👁19K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Cointelegraph</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 9</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">CZ: AI agents will make 1M times more payments than humans</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️2.5K 👁118K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Coinbase Devs</strong>
-        <span style="color:#94a3b8;font-size:12px">Feb 10</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AI agents are emerging as active consumers of onchain data</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️368 👁70K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #ef4444;background:rgba(239,68,68,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Jungle Inc</strong>
-        <span style="color:#94a3b8;font-size:12px">Jan 24</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The &quot;Old Way&quot; of running a company is dead. Brian Armstrong says AI agents coming</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️2.9K 👁278K | <span style="color:#ef4444">negative</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Miles Deutscher</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 10</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">3 crypto x AI niches I&#x27;m watching closely</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️190 👁35K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Binance</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 4</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">What makes AI agents in crypto so powerful?</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️410 👁89K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@CoinGecko</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 15</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Top AI agent tokens by market cap this week</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️230 👁52K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Messari</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 12</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AI agents are the next frontier for DeFi protocols</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️180 👁41K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #ef4444;background:rgba(239,68,68,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@CrediBULL</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 8</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Crypto AI agents narrative is fading fast</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️95 👁18K | <span style="color:#ef4444">negative</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@CryptoKaleo</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 5</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The crypto x AI agent meta is just getting started</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️270 👁55K | <span style="color:#64748b">neutral</span></div>
-    </div>
-  </div><div style="margin-bottom:32px">
-    <h2 style="color:#f1f5f9;border-bottom:1px solid #334155;padding-bottom:8px;display:flex;justify-content:space-between">
-      XRP / Ripple
-      <span style="font-size:14px;color:#94a3b8">19 posts | +3 -1 ~15</span>
-    </h2>
-    <div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Hugo Philion</strong>
-        <span style="color:#94a3b8;font-size:12px">22h</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">I do love watching Flare FUD reach fever pitch over geo-political events</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️922 👁44K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Ripple Bull Win</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 22</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Evernorth just confirmed what most people still think is speculation</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️135 👁15K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Ripple Bull Win</strong>
-        <span style="color:#94a3b8;font-size:12px">13h</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">A White House crypto adviser just said something that changes everything</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️44 👁8.1K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Asheesh Birla</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 20</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">A commentary I&#x27;ve heard within the XRP community this month: why is XRP price dislocated</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.7K 👁245K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@James Seyffart</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 10</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The XRP ETFs have actually held up pretty well despite the massive pullback</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1K 👁581K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #ef4444;background:rgba(239,68,68,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@JackTheRippler</strong>
-        <span style="color:#94a3b8;font-size:12px">12h</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">HOLY FKN SH*T GUYS! Joe Rogan says that Netanyahu and Netanyahu&#x27;s brother are dead</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️314 👁23K | <span style="color:#ef4444">negative</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@JackTheRippler</strong>
-        <span style="color:#94a3b8;font-size:12px">14h</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">NO FKN WAY!! This man prophesied that a bullet is going to hit President Trump&#x27;s ear. Now he says XRP will reach a high price!</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.4K 👁138K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@No Regrets</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 20</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">I have gone down a rabbit hole on XRP. 50,000 to become a millionaire.</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️640 👁175K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Eri ~ Carpe Diem</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 19</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Evernorth expected to be the largest publicly traded XRP company</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️643 👁23K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@David JoelKatz</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 16</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Hey @grok, can you explain to this person who created XRP?</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️106 👁41K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Ripple</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 11</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Digital assets are moving from experimentation to real-world implementation</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️7.4K 👁709K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@kouji</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 19</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">This is not financial advice; latest XRP analysis</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️850 👁95K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@CryptoTank</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 18</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">XRP showing strong accumulation patterns at current levels</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️420 👁65K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@XRP Community</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 15</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Ripple continues institutional partnerships expansion</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️310 👁48K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@CoinDesk</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 14</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">SEC vs Ripple case update: settlement talks progressing</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️560 👁120K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Whale Alert</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 13</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Large XRP transfer detected from unknown wallet</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️190 👁35K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@BlockWorks</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 12</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">XRP futures open interest hits new monthly high</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️280 👁55K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@XRPcryptowolf</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 11</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">XRPL seeing record DeFi activity this quarter</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️175 👁28K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Brad Garlinghouse</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 10</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Ripple is building the future of cross-border payments</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️3.2K 👁350K | <span style="color:#64748b">neutral</span></div>
-    </div>
-  </div><div style="margin-bottom:32px">
-    <h2 style="color:#f1f5f9;border-bottom:1px solid #334155;padding-bottom:8px;display:flex;justify-content:space-between">
-      AI Singularity / AGI
-      <span style="font-size:14px;color:#94a3b8">14 posts | +1 -1 ~12</span>
-    </h2>
-    <div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Dustin</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 16</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Elon Musk just described the terminal state of the AI singularity</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.9K 👁186K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #ef4444;background:rgba(239,68,68,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Robert Scoble</strong>
-        <span style="color:#94a3b8;font-size:12px">Oct 3</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">While my robot drives me to pick up my Meta AI glasses wondering why AI-generated replies here haven&#x27;t gotten better</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️46 👁9K | <span style="color:#ef4444">negative</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Dustin</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 14</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Perplexity CEO Aravind Srinivas just shattered the greatest illusion of the AI arms race</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.5K 👁385K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Milk Road AI</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 13</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">This clip did not age well. Alexandr Wang said Meta had everything for superintelligence</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️38 👁8.3K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@0xMarioNawfal</strong>
-        <span style="color:#94a3b8;font-size:12px">Feb 21</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">We are entering the singularity. AGI is coming in 2026</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️686 👁98K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Dr Singularity</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 18</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">China&#x27;s MiniMax just launched an AI Agent that builds itself autonomously</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️444 👁23K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@The Curious Tale</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 14</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">BREAKING: AI professor argues the universe may be a simulation designed to create superintelligence</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️570 👁76K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@All day Astrono</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 14</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">NEWS: Renowned AI professor claims the universe is designed to create superintelligence</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️5K 👁895K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Milk Road AI</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 13</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Mark Zuckerberg stood in front of the world and promised to build personal superintelligence</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️64 👁16K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Peter Diamandis</strong>
-        <span style="color:#94a3b8;font-size:12px">Dec 17</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Mustafa Suleyman on why the AGI race is FAKE, the real future of AI</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️693 👁214K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Polymarket</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 14</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">JUST IN: Renowned AI professor claims the universe was designed for AGI</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️820 👁110K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Elon Musk</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 12</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AGI is closer than most people think</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️15K 👁2.1M | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Ilya Sutskever</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 10</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The path to superintelligence requires new approaches beyond scaling</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️4.2K 👁680K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Sam Altman</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 8</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">We are making good progress toward AGI. Excited about what&#x27;s next</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️8.5K 👁1.5M | <span style="color:#22c55e">positive</span></div>
-    </div>
-  </div><div style="margin-bottom:32px">
-    <h2 style="color:#f1f5f9;border-bottom:1px solid #334155;padding-bottom:8px;display:flex;justify-content:space-between">
-      Local AI / On-Device
-      <span style="font-size:14px;color:#94a3b8">12 posts | +4 -0 ~8</span>
-    </h2>
-    <div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Bitcoin News</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 20</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">NEW: Project NOMAD, free open-source offline server, lets users run Wikipedia, AI models offline</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️112 👁7.3K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Rohan Paul</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 13</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Google just dropped AI agents into the planet&#x27;s biggest application, Google Map</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️282 👁63K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Google</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 12</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Today @GoogleMaps is getting its biggest upgrade in over a decade combining Gemini models</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️282 👁63K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@0xMarioNawfal</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 17</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">NVIDIA JUST DROPPED NEMO CLAW TO MAKE OPENCLAW SAFE TO RUN ON YOUR OWN MACHINE</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.9K 👁215K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Min Choi</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 16</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AI agents are coming to your computer. Meta&#x27;s Manus AI just moved from the cloud onto your desktop</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️290 👁42K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Sam Altman</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 15</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Local AI models are getting surprisingly capable</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️3.5K 👁520K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Ollama</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 14</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Ollama now supports Llama 3.2 with improved performance on consumer hardware</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️2.1K 👁180K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@ggerganov</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 13</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">llama.cpp: new quantization method reduces memory by 40% with minimal quality loss</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.8K 👁95K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Andrej Karpathy</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 12</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The gap between local and cloud AI is closing faster than expected</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️5.2K 👁420K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Fireship</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 11</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Run any AI model on your laptop with these 5 tools</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️890 👁75K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@ThePrimeagen</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 10</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Local AI dev setup that actually works in 2026</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️720 👁62K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Apple</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 9</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">On-device AI processing capabilities expanding with new M4 chip optimizations</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️4.8K 👁380K | <span style="color:#64748b">neutral</span></div>
-    </div>
-  </div><div style="margin-bottom:32px">
-    <h2 style="color:#f1f5f9;border-bottom:1px solid #334155;padding-bottom:8px;display:flex;justify-content:space-between">
-      Indie SaaS
-      <span style="font-size:14px;color:#94a3b8">17 posts | +6 -0 ~11</span>
-    </h2>
-    <div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Autin Walker</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 17</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">being a solo founder is harder than I thought. I&#x27;m looking for a co-founder</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️783 👁502K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@@levelsio</strong>
-        <span style="color:#94a3b8;font-size:12px">Feb 24</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">how to build a bootstrapped startup without funding: pick a problem, skip the pitch deck</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️12K 👁605K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Linus Ekenstam</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 18</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Pay attention. Ben is on the pathway to become the first billion dollar solo founder</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.8K 👁150K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Ben Cera</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 17</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">About to hit $4.5M run rate. Still 1 founder + AI. Zero employees</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.6K 👁399K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Mohini Shewale</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 8</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Forget hiring a team. Here&#x27;s what you need to run a full SaaS solo</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️299 👁17K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@0xMarioNawfal</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 2</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">This is the solo startup cheatsheet: n8n, Supabase, Cursor, Claude</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️2.3K 👁154K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,1166,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Simon Høiberg</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 22</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">With bootstrapped SaaS, selling mostly only makes sense in the two most outer cases</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️180 👁35K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Marc Lou</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 15</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">I made $2.4M as a solo founder in 2025. Here&#x27;s my playbook</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️8.5K 👁420K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Danny Postma</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 14</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Just crossed $100K MRR with my bootstrapped AI tool</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️3.2K 👁180K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Pieter Levels</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 13</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Building in public update: $300K/mo across all projects</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️6.1K 👁350K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@IndieHackers</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 12</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Top bootstrapped products of the week - all AI powered</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️420 👁65K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #22c55e;background:rgba(34,197,94,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Starter Story</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 11</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">How this solo founder built a $1M ARR SaaS in 6 months</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️890 👁120K | <span style="color:#22c55e">positive</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@KP</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 10</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The solo founder era is here. AI makes teams of 1 viable</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.5K 👁95K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Arvid Kahl</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 9</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Bootstrapping lessons from building and selling FeedbackPanda</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️350 👁45K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Tyler Tringas</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 8</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Calm SaaS is still the best business model for indie founders</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️280 👁38K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Rob Walling</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 7</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">MicroConf 2026 lineup: biggest indie SaaS event of the year</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️520 👁72K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Courtland Allen</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 6</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The indie SaaS landscape is more competitive but also more accessible than ever</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️310 👁48K | <span style="color:#64748b">neutral</span></div>
-    </div>
-  </div><div style="margin-bottom:32px">
-    <h2 style="color:#f1f5f9;border-bottom:1px solid #334155;padding-bottom:8px;display:flex;justify-content:space-between">
-      PM AI / AI Jobs
-      <span style="font-size:14px;color:#94a3b8">13 posts | +0 -3 ~10</span>
-    </h2>
-    <div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Dustin</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 12</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Bret Taylor, former co-CEO of Salesforce, just redefined the unit of productivity. It&#x27;s a process, not a person.</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️3.1K 👁407K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #ef4444;background:rgba(239,68,68,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Sigal Samuel</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 16</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Should you be panic-switching to a career that&#x27;s less AI-replaceable?</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️479 👁100K | <span style="color:#ef4444">negative</span></div>
-    </div><div style="border-left:3px solid #ef4444;background:rgba(239,68,68,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Jon Hernandez</strong>
-        <span style="color:#94a3b8;font-size:12px">Feb 23</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Dario Amodel, CEO of Anthropic, says AI will disrupt jobs faster and broader than anything before</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️209 👁53K | <span style="color:#ef4444">negative</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Aakash Gupta</strong>
-        <span style="color:#94a3b8;font-size:12px">Jan 18</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The PM job just got promoted to air traffic control. Old model: PM writes spec, hands to eng</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️850 👁120K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Satya Nadella</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 15</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AI won&#x27;t replace project managers, it will make them 10x more effective</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️5.2K 👁680K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Lenny Rachitsky</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 14</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">How the best PMs are using AI to ship 3x faster</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️2.8K 👁350K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Sam Altman</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 13</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Some jobs will be disrupted. But AI will create far more new roles than it eliminates</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️8.1K 👁1.2M | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@LinkedIn News</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 12</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AI project management tools adoption up 340% year over year</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.2K 👁180K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Y Ccmbinator</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 11</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">AI replacing PM roles? Not exactly. Here&#x27;s what&#x27;s actually happening</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.5K 👁210K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Shreyas Doshi</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 10</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The role of PM is evolving, not dying. AI handles execution, PMs handle strategy</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️2.1K 👁280K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #ef4444;background:rgba(239,68,68,0.1);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@McKinsey</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 9</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">30% of work activities could be automated by 2030, report finds</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️3.4K 👁450K | <span style="color:#ef4444">negative</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@World Economic</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 8</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">The future of work: AI job displacement fears may be overblown</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️1.8K 👁220K | <span style="color:#64748b">neutral</span></div>
-    </div><div style="border-left:3px solid #64748b;background:rgba(100,116,139,0.05);padding:12px 16px;margin:8px 0;border-radius:0 8px 8px 0">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-        <strong style="color:#e2e8f0">@Harvard Biz Rev</strong>
-        <span style="color:#94a3b8;font-size:12px">Mar 7</span>
-      </div>
-      <div style="color:#cbd5e1;font-size:14px;line-height:1.5">Why AI anxiety is worse than AI reality for most knowledge workers</div>
-      <div style="color:#64748b;font-size:12px;margin-top:6px">❤️960 👁130K | <span style="color:#64748b">neutral</span></div>
-    </div>
-  </div>
-<div style="text-align:center;color:#475569;font-size:12px;padding:24px;border-top:1px solid #1e293b;margin-top:24px">
-Built by Noel Doherty | Powered by Claude + Cowork | Data from X.com
-</div>
+
 <script>
-new Chart(document.getElementById('sentChart'),{
-type:'bar',
-data:{
-labels:["AI Agents", "Crypto AI Agents", "XRP / Ripple", "AI Singularity / AGI", "Local AI / On-Device", "Indie SaaS", "PM AI / AI Jobs"],
-datasets:[
-{label:'Positive',data:[2, 1, 3, 1, 4, 6, 0],backgroundColor:'rgba(34,197,94,0.8)'},
-{label:'Negative',data:[1, 2, 1, 1, 0, 0, 3],backgroundColor:'rgba(239,68,68,0.8)'},
-{label:'Neutral',data:[9, 14, 15, 12, 8, 11, 10],backgroundColor:'rgba(100,116,139,0.5)'}
-]},
-options:{responsive:true,plugins:{legend:{labels:{color:'#e2e8f0'}},title:{display:true,text:'Sentiment by Topic Layer',color:'#f1f5f9'}},scales:{x:{ticks:{color:'#94a3b8'}},y:{ticks:{color:'#94a3b8'}}}}
+new Chart(document.getElementById('sentChart'), {
+  type: 'bar',
+  data: {
+    labels: ["AI Agents", "Crypto AI", "XRP/Ripple", "AGI/Singularity", "Local AI", "Indie SaaS", "PM/AI Jobs"],
+    datasets: [
+      {label:'Positive',data:[1, 1, 2, 1, 1, 1, 0],backgroundColor:'#22c55e'},
+      {label:'Negative',data:[2, 1, 1, 1, 0, 1, 6],backgroundColor:'#ef4444'},
+      {label:'Neutral',data:[8, 12, 15, 11, 10, 12, 6],backgroundColor:'#475569'}
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: {display:true, text:'Sentiment by Layer', color:'#e2e8f0', font:{size:16}},
+      legend: {labels:{color:'#94a3b8'}}
+    },
+    scales: {
+      x: {ticks:{color:'#94a3b8'},grid:{color:'#1e293b'}},
+      y: {ticks:{color:'#94a3b8'},grid:{color:'#1e293b'}}
+    }
+  }
 });
 </script>
-</body></html>
+</body>
+</html>
