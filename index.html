@@ -1,124 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>X Sentiment Dashboard - AI &amp; Tech</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X Sentiment Dashboard - AI & Tech</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#e2e8f0;padding:20px;max-width:1200px;margin:0 auto}
-h1{text-align:center;font-size:1.8em;margin-bottom:5px;color:#f1f5f9;letter-spacing:-0.5px}
-h2{font-size:1.3em;margin:25px 0 12px;color:#cbd5e1}
-.subtitle{text-align:center;color:#64748b;margin-bottom:25px;font-size:.9em}
-.stats{display:flex;gap:15px;justify-content:center;flex-wrap:wrap;margin:20px 0}
-.stat{background:#1e293b;border-radius:12px;padding:18px 28px;text-align:center;min-width:130px;border:1px solid #334155}
-.stat .num{font-size:2.2em;font-weight:700}
-.stat .label{font-size:.8em;color:#94a3b8;margin-top:4px;text-transform:uppercase;letter-spacing:1px}
-.pos{color:#22c55e}.neg{color:#ef4444}.neu{color:#94a3b8}
-.chart-container{background:#1e293b;border-radius:12px;padding:20px;margin:25px auto;max-width:800px;border:1px solid #334155}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin:15px 0}
-.layer-card{background:#1e293b;border-radius:12px;padding:18px;border:1px solid #334155}
-.layer-card h3{color:#60a5fa;margin-bottom:8px;font-size:1em}
-.layer-stats{margin-bottom:10px;font-size:1.1em;font-weight:600}
-.top-tweet{color:#94a3b8;font-size:.82em;line-height:1.4;font-style:italic}
-.trend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:10px 0}
-.trend-item{background:#1e293b;border-radius:8px;padding:10px 14px;border:1px solid #334155;display:flex;align-items:center;gap:10px}
-.trend-rank{color:#60a5fa;font-weight:700;font-size:.9em;min-width:22px}
-.trend-name{color:#e2e8f0;font-size:.88em}
-.footer{text-align:center;color:#475569;margin-top:30px;padding:15px;font-size:.8em;border-top:1px solid #1e293b}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0f;color:#e0e0e0;padding:20px;max-width:1200px;margin:0 auto}
+h1{font-size:1.8em;margin-bottom:4px;color:#fff}
+.subtitle{color:#888;margin-bottom:20px;font-size:0.9em}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-box{background:#151520;border-radius:10px;padding:16px;text-align:center;border:1px solid #222}
+.stat-box .num{font-size:2em;font-weight:700;color:#fff}
+.stat-box .label{font-size:0.8em;color:#888;margin-top:4px}
+.stat-box.positive .num{color:#4ade80}
+.stat-box.negative .num{color:#f87171}
+.stat-box.neutral .num{color:#60a5fa}
+.card{background:#151520;border-radius:10px;padding:20px;margin-bottom:16px;border:1px solid #222}
+.card h2{font-size:1.2em;margin-bottom:12px;color:#fff}
+.tweet-card{background:#1a1a28;border-radius:8px;padding:14px;margin-bottom:10px;border-left:3px solid #444}
+.tweet-card.positive{border-left-color:#4ade80}
+.tweet-card.negative{border-left-color:#f87171}
+.tweet-card.neutral{border-left-color:#60a5fa}
+.tweet-meta{font-size:0.8em;color:#888;margin-bottom:6px}
+.tweet-text{font-size:0.9em;line-height:1.4;margin-bottom:8px}
+.tweet-stats{font-size:0.8em;color:#666}
+.layer-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #1a1a28}
+.layer-name{min-width:120px;font-weight:600;font-size:0.9em}
+.layer-count{min-width:70px;font-size:0.8em;color:#888}
+.sentiment-bar{flex:1;height:8px;border-radius:4px;display:flex;overflow:hidden;background:#222}
+.sentiment-bar .pos{background:#4ade80}
+.sentiment-bar .neu{background:#60a5fa}
+.sentiment-bar .neg{background:#f87171}
+.layer-sentiment{min-width:100px;font-size:0.75em;color:#888;text-align:right}
+.trending-list{display:flex;flex-wrap:wrap;gap:8px}
+.trending-tag{background:#1a1a28;padding:6px 12px;border-radius:20px;font-size:0.85em;border:1px solid #333}
+.chart-container{position:relative;height:300px;margin:10px 0}
 </style>
 </head>
 <body>
 <h1>X Sentiment Dashboard</h1>
-<p class="subtitle">Last updated: 2026-03-23 06:38 UTC &bull; 93 posts across 7 layers + 30 trending topics</p>
+<p class="subtitle">AI & Tech Pulse · Last updated: 2026-03-23 09:11 · Hourly scrape</p>
 
-<div class="stats">
-  <div class="stat"><div class="num pos">7</div><div class="label">Positive</div></div>
-  <div class="stat"><div class="num neg">12</div><div class="label">Negative</div></div>
-  <div class="stat"><div class="num neu">74</div><div class="label">Neutral</div></div>
-  <div class="stat"><div class="num" style="color:#60a5fa">93</div><div class="label">Total Posts</div></div>
-  <div class="stat"><div class="num" style="color:#a78bfa">30</div><div class="label">Trending</div></div>
+<div class="stats-grid">
+<div class="stat-box"><div class="num">35</div><div class="label">Total Posts</div></div>
+<div class="stat-box positive"><div class="num">3</div><div class="label">Positive</div></div>
+<div class="stat-box negative"><div class="num">4</div><div class="label">Negative</div></div>
+<div class="stat-box neutral"><div class="num">28</div><div class="label">Neutral</div></div>
 </div>
 
-<div class="chart-container">
-  <canvas id="sentChart"></canvas>
+<div class="card">
+<h2>Sentiment by Layer</h2>
+<div class="chart-container"><canvas id="sentimentChart"></canvas></div>
 </div>
 
+<div class="card">
 <h2>Layer Breakdown</h2>
-<div class="grid"><div class="layer-card">
-      <h3>AI Agents</h3>
-      <div class="layer-stats">
-        <span class="pos">1+</span> <span class="neg">2-</span> <span class="neu">8~</span> <span style="color:#60a5fa">(11)</span>
-      </div>
-      <div class="top-tweet">@Rohan Paul: Chamath on how AI agents are making the 10x engineer distinction disappear</div>
-    </div><div class="layer-card">
-      <h3>Crypto AI</h3>
-      <div class="layer-stats">
-        <span class="pos">1+</span> <span class="neg">1-</span> <span class="neu">12~</span> <span style="color:#60a5fa">(14)</span>
-      </div>
-      <div class="top-tweet">@Brian Armstrong: Very soon there are going to be more AI agents than humans making transactions</div>
-    </div><div class="layer-card">
-      <h3>XRP/Ripple</h3>
-      <div class="layer-stats">
-        <span class="pos">2+</span> <span class="neg">1-</span> <span class="neu">15~</span> <span style="color:#60a5fa">(18)</span>
-      </div>
-      <div class="top-tweet">@James Seyffart: The XRP ETFs have actually held up pretty well despite the massive pullback</div>
-    </div><div class="layer-card">
-      <h3>AGI/Singularity</h3>
-      <div class="layer-stats">
-        <span class="pos">1+</span> <span class="neg">1-</span> <span class="neu">11~</span> <span style="color:#60a5fa">(13)</span>
-      </div>
-      <div class="top-tweet">@Polymarket: JUST IN: Renowned AI professor claims the universe is a simulation</div>
-    </div><div class="layer-card">
-      <h3>Local AI</h3>
-      <div class="layer-stats">
-        <span class="pos">1+</span> <span class="neg">0-</span> <span class="neu">10~</span> <span style="color:#60a5fa">(11)</span>
-      </div>
-      <div class="top-tweet">@God of Prompt: BREAKING: Someone just open-sourced a full offline survival computer with AI</div>
-    </div><div class="layer-card">
-      <h3>Indie SaaS</h3>
-      <div class="layer-stats">
-        <span class="pos">1+</span> <span class="neg">1-</span> <span class="neu">12~</span> <span style="color:#60a5fa">(14)</span>
-      </div>
-      <div class="top-tweet">@The Startup Ideas Podcast: 1-person companies are coming. One human. A team of digital employees</div>
-    </div><div class="layer-card">
-      <h3>PM/AI Jobs</h3>
-      <div class="layer-stats">
-        <span class="pos">0+</span> <span class="neg">6-</span> <span class="neu">6~</span> <span style="color:#60a5fa">(12)</span>
-      </div>
-      <div class="top-tweet">@Dustin: Bret Taylor, former co-CEO of Salesforce and chair of OpenAI, just redefined productivity</div>
-    </div></div>
+<div class="layer-row">
+            <div class="layer-name">AI Agents</div>
+            <div class="layer-count">3 posts</div>
+            <div class="sentiment-bar"><div class="pos" style="width:0%"></div><div class="neu" style="width:67%"></div><div class="neg" style="width:33%"></div></div>
+            <div class="layer-sentiment">+0 / 1- / 2~</div>
+        </div><div class="layer-row">
+            <div class="layer-name">Crypto AI</div>
+            <div class="layer-count">3 posts</div>
+            <div class="sentiment-bar"><div class="pos" style="width:33%"></div><div class="neu" style="width:67%"></div><div class="neg" style="width:0%"></div></div>
+            <div class="layer-sentiment">+1 / 0- / 2~</div>
+        </div><div class="layer-row">
+            <div class="layer-name">XRP/Ripple</div>
+            <div class="layer-count">9 posts</div>
+            <div class="sentiment-bar"><div class="pos" style="width:11%"></div><div class="neu" style="width:89%"></div><div class="neg" style="width:0%"></div></div>
+            <div class="layer-sentiment">+1 / 0- / 8~</div>
+        </div><div class="layer-row">
+            <div class="layer-name">AGI/Singularity</div>
+            <div class="layer-count">4 posts</div>
+            <div class="sentiment-bar"><div class="pos" style="width:25%"></div><div class="neu" style="width:75%"></div><div class="neg" style="width:0%"></div></div>
+            <div class="layer-sentiment">+1 / 0- / 3~</div>
+        </div><div class="layer-row">
+            <div class="layer-name">Local AI</div>
+            <div class="layer-count">5 posts</div>
+            <div class="sentiment-bar"><div class="pos" style="width:0%"></div><div class="neu" style="width:100%"></div><div class="neg" style="width:0%"></div></div>
+            <div class="layer-sentiment">+0 / 0- / 5~</div>
+        </div><div class="layer-row">
+            <div class="layer-name">Indie SaaS</div>
+            <div class="layer-count">5 posts</div>
+            <div class="sentiment-bar"><div class="pos" style="width:0%"></div><div class="neu" style="width:80%"></div><div class="neg" style="width:20%"></div></div>
+            <div class="layer-sentiment">+0 / 1- / 4~</div>
+        </div><div class="layer-row">
+            <div class="layer-name">PM/AI Jobs</div>
+            <div class="layer-count">6 posts</div>
+            <div class="sentiment-bar"><div class="pos" style="width:0%"></div><div class="neu" style="width:67%"></div><div class="neg" style="width:33%"></div></div>
+            <div class="layer-sentiment">+0 / 2- / 4~</div>
+        </div>
+</div>
 
-<h2>Trending Topics</h2>
-<div class="trend-grid"><div class="trend-item"><span class="trend-rank">1</span><span class="trend-name">Kepa</span></div><div class="trend-item"><span class="trend-rank">2</span><span class="trend-name">Easter</span></div><div class="trend-item"><span class="trend-rank">3</span><span class="trend-name">#ARSMCI</span></div><div class="trend-item"><span class="trend-rank">4</span><span class="trend-name">Golders Green</span></div><div class="trend-item"><span class="trend-rank">5</span><span class="trend-name">Spurs</span></div><div class="trend-item"><span class="trend-rank">6</span><span class="trend-name">Sunderland</span></div><div class="trend-item"><span class="trend-rank">7</span><span class="trend-name">Howe</span></div><div class="trend-item"><span class="trend-rank">8</span><span class="trend-name">#CarabaoCupFinal</span></div><div class="trend-item"><span class="trend-rank">9</span><span class="trend-name">Saka</span></div><div class="trend-item"><span class="trend-rank">10</span><span class="trend-name">#SAFC</span></div><div class="trend-item"><span class="trend-rank">11</span><span class="trend-name">#NUFC</span></div><div class="trend-item"><span class="trend-rank">12</span><span class="trend-name">Diego Garcia</span></div><div class="trend-item"><span class="trend-rank">13</span><span class="trend-name">chappell</span></div><div class="trend-item"><span class="trend-rank">14</span><span class="trend-name">Cherki</span></div><div class="trend-item"><span class="trend-rank">15</span><span class="trend-name">West Ham</span></div><div class="trend-item"><span class="trend-rank">16</span><span class="trend-name">Cadbury</span></div><div class="trend-item"><span class="trend-rank">17</span><span class="trend-name">Havertz</span></div><div class="trend-item"><span class="trend-rank">18</span><span class="trend-name">#NEWSUN</span></div><div class="trend-item"><span class="trend-rank">19</span><span class="trend-name">Nico O'Reilly</span></div><div class="trend-item"><span class="trend-rank">20</span><span class="trend-name">Trossard</span></div><div class="trend-item"><span class="trend-rank">21</span><span class="trend-name">John Terry</span></div><div class="trend-item"><span class="trend-rank">22</span><span class="trend-name">Brobbey</span></div><div class="trend-item"><span class="trend-rank">23</span><span class="trend-name">NO EZE</span></div><div class="trend-item"><span class="trend-rank">24</span><span class="trend-name">Trafford</span></div><div class="trend-item"><span class="trend-rank">25</span><span class="trend-name">Hincapie</span></div><div class="trend-item"><span class="trend-rank">26</span><span class="trend-name">Chelsea</span></div><div class="trend-item"><span class="trend-rank">27</span><span class="trend-name">Steve Reed</span></div><div class="trend-item"><span class="trend-rank">28</span><span class="trend-name">Cuba</span></div><div class="trend-item"><span class="trend-rank">29</span><span class="trend-name">Saliba</span></div><div class="trend-item"><span class="trend-rank">30</span><span class="trend-name">Forest</span></div></div>
+<div class="card"><h2>Trending on X</h2><div class="trending-list"><span class="trending-tag">Trump Issues 48-Hour Ultimatum to Iran Over Strait of Hormuz</span><span class="trending-tag">Reacher Star Alan Ritchson in Neighborhood Bike Scuffle</span><span class="trending-tag">Iran Mocks Trump's You're Fired Ultimatum on Strait of Hormuz</span><span class="trending-tag">Newcastle</span><span class="trending-tag">Chappell</span><span class="trending-tag">Uncle Simon</span><span class="trending-tag">#EnicOut</span><span class="trending-tag">Jewish Community</span><span class="trending-tag">#theCapture</span></div></div>
 
-<div class="footer">
-  Noel Doherty's AI &amp; Tech Sentiment Tracker &bull; Auto-updated hourly via Claude Cowork
+<div class="card">
+<h2>Top Posts by Engagement</h2>
+<div class="tweet-card neutral">
+            <div class="tweet-meta"><strong>@God of Prompt</strong> · Local AI · Mar 21</div>
+            <div class="tweet-text">BREAKING: Someone just open-sourced a full offline survival computer with AI, Wikipedia, and maps built in. Project N.O.M.A.D. is an open-source offline system</div>
+            <div class="tweet-stats">💬 331 &nbsp; 🔁 3.2K &nbsp; ❤️ 21K &nbsp; 👁 0</div>
+        </div><div class="tweet-card neutral">
+            <div class="tweet-meta"><strong>@Brian Armstrong</strong> · Crypto AI · Mar 9</div>
+            <div class="tweet-text">Very soon there are going to be more AI agents than humans making transactions. They cant open a bank account, but they can own a crypto wallet. Think about it.</div>
+            <div class="tweet-stats">💬 2.2K &nbsp; 🔁 3.9K &nbsp; ❤️ 20K &nbsp; 👁 4.6M</div>
+        </div><div class="tweet-card negative">
+            <div class="tweet-meta"><strong>@The Rundown AI</strong> · PM/AI Jobs · Mar 6</div>
+            <div class="tweet-text">Anthropic just studied which jobs AI can theoretically replace vs which ones its actually automating right now. Computer and math: 94% exposed. Legal roles heavily impacted.</div>
+            <div class="tweet-stats">💬 182 &nbsp; 🔁 622 &nbsp; ❤️ 3.1K &nbsp; 👁 0</div>
+        </div><div class="tweet-card neutral">
+            <div class="tweet-meta"><strong>@0xMarioNawfal</strong> · Indie SaaS · Mar 2</div>
+            <div class="tweet-text">This is the solo startup cheatsheet: n8n automation, Supabase backend, Cursor code, Claude thinking, Vercel deploy, Stripe payment</div>
+            <div class="tweet-stats">💬 86 &nbsp; 🔁 243 &nbsp; ❤️ 2.3K &nbsp; 👁 0</div>
+        </div><div class="tweet-card negative">
+            <div class="tweet-meta"><strong>@levelsio</strong> · Indie SaaS · Mar 10</div>
+            <div class="tweet-text">how to build a bootstrapped startup without funding: pick a problem you personally have</div>
+            <div class="tweet-stats">💬 100 &nbsp; 🔁 200 &nbsp; ❤️ 1.5K &nbsp; 👁 0</div>
+        </div><div class="tweet-card positive">
+            <div class="tweet-meta"><strong>@Dustin</strong> · AGI/Singularity · Mar 14</div>
+            <div class="tweet-text">Perplexity CEO Aravind Srinivas just shattered the greatest illusion of the AI arms race. The entire market is waiting for a single god-like superintelligence</div>
+            <div class="tweet-stats">💬 109 &nbsp; 🔁 270 &nbsp; ❤️ 1.5K &nbsp; 👁 0</div>
+        </div><div class="tweet-card neutral">
+            <div class="tweet-meta"><strong>@Simplifying AI</strong> · Local AI · Mar 17</div>
+            <div class="tweet-text">You can now give Claude Code a visual map of your entire codebase. Someone just open-sourced a tool that builds a local graph of your entire project</div>
+            <div class="tweet-stats">💬 28 &nbsp; 🔁 171 &nbsp; ❤️ 1.1K &nbsp; 👁 0</div>
+        </div><div class="tweet-card neutral">
+            <div class="tweet-meta"><strong>@Rohan Paul</strong> · AI Agents · Mar 19</div>
+            <div class="tweet-text">Chamath on how AI agents are making the 10x engineer distinction disappear because the most efficient code paths are now obvious to everyone.</div>
+            <div class="tweet-stats">💬 273 &nbsp; 🔁 203 &nbsp; ❤️ 994 &nbsp; 👁 809K</div>
+        </div><div class="tweet-card positive">
+            <div class="tweet-meta"><strong>@Hugo Philion</strong> · XRP/Ripple · Mar 22</div>
+            <div class="tweet-text">I do love watching Flare FUD reach fever pitch over geopolitical instability. Others, bigger, have tried but Flare is the only</div>
+            <div class="tweet-stats">💬 106 &nbsp; 🔁 242 &nbsp; ❤️ 940 &nbsp; 👁 0</div>
+        </div><div class="tweet-card neutral">
+            <div class="tweet-meta"><strong>@weisser</strong> · Indie SaaS · Mar 4</div>
+            <div class="tweet-text">1.5M ARR in 2 weeks. Zero human teammates. Solo Founders Podcast is live with an AI that runs your company while you sleep</div>
+            <div class="tweet-stats">💬 81 &nbsp; 🔁 93 &nbsp; ❤️ 784 &nbsp; 👁 0</div>
+        </div>
 </div>
 
 <script>
-new Chart(document.getElementById('sentChart'), {
-  type: 'bar',
-  data: {
-    labels: ["AI Agents", "Crypto AI", "XRP/Ripple", "AGI/Singularity", "Local AI", "Indie SaaS", "PM/AI Jobs"],
-    datasets: [
-      {label:'Positive',data:[1, 1, 2, 1, 1, 1, 0],backgroundColor:'#22c55e'},
-      {label:'Negative',data:[2, 1, 1, 1, 0, 1, 6],backgroundColor:'#ef4444'},
-      {label:'Neutral',data:[8, 12, 15, 11, 10, 12, 6],backgroundColor:'#475569'}
-    ]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      title: {display:true, text:'Sentiment by Layer', color:'#e2e8f0', font:{size:16}},
-      legend: {labels:{color:'#94a3b8'}}
-    },
-    scales: {
-      x: {ticks:{color:'#94a3b8'},grid:{color:'#1e293b'}},
-      y: {ticks:{color:'#94a3b8'},grid:{color:'#1e293b'}}
-    }
-  }
+new Chart(document.getElementById('sentimentChart'),{
+type:'bar',
+data:{
+labels:["AI Agents", "Crypto AI", "XRP/Ripple", "AGI/Singularity", "Local AI", "Indie SaaS", "PM/AI Jobs"],
+datasets:[
+{label:'Positive',data:[0, 1, 1, 1, 0, 0, 0],backgroundColor:'#4ade80'},
+{label:'Neutral',data:[2, 2, 8, 3, 5, 4, 4],backgroundColor:'#60a5fa'},
+{label:'Negative',data:[1, 0, 0, 0, 0, 1, 2],backgroundColor:'#f87171'}
+]
+},
+options:{
+responsive:true,maintainAspectRatio:false,
+plugins:{legend:{labels:{color:'#888'}}},
+scales:{
+x:{stacked:true,ticks:{color:'#888'},grid:{color:'#222'}},
+y:{stacked:true,ticks:{color:'#888'},grid:{color:'#222'}}
+}
+}
 });
 </script>
 </body>
