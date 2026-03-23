@@ -3,180 +3,397 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>X Sentiment Dashboard - AI & Tech</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<title>X Sentiment Dashboard — AI Agents &amp; Topics</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; }
-.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-h1 { color: #58a6ff; margin-bottom: 5px; font-size: 1.8em; }
-h2 { color: #58a6ff; margin: 25px 0 15px; font-size: 1.3em; border-bottom: 1px solid #21262d; padding-bottom: 8px; }
-.subtitle { color: #8b949e; margin-bottom: 20px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin: 15px 0; }
-.card { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 18px; }
-.card h3 { color: #f0f6fc; font-size: 1em; margin-bottom: 10px; }
-.stat { font-size: 2em; font-weight: bold; color: #58a6ff; }
-.chart-container { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 20px; margin: 15px 0; }
-canvas { max-height: 350px; }
-.trending-item { padding: 8px 12px; border-bottom: 1px solid #21262d; }
-.trending-item .topic { color: #f0f6fc; font-weight: 500; }
-.trending-item .count { color: #8b949e; font-size: 0.85em; }
-.post-card { background: #161b22; border: 1px solid #21262d; border-radius: 8px; padding: 14px; margin-bottom: 10px; }
-.post-header { margin-bottom: 8px; font-size: 0.9em; }
-.post-header strong { color: #58a6ff; }
-.layer-tag { background: #21262d; color: #8b949e; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-left: 8px; }
-.post-text { color: #c9d1d9; line-height: 1.5; margin-bottom: 8px; }
-.post-stats { color: #8b949e; font-size: 0.85em; }
-.sentiment-positive { color: #3fb950; font-weight: 600; }
-.sentiment-negative { color: #f85149; font-weight: 600; }
-.sentiment-neutral { color: #8b949e; font-weight: 600; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #21262d; font-size: 0.9em; }
-th { color: #8b949e; font-weight: 600; }
-.muted { color: #484f58; font-style: italic; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
+h1 { text-align: center; font-size: 1.8rem; margin-bottom: 5px; color: #f8fafc; }
+.subtitle { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; }
+.stats-row { display: flex; gap: 15px; justify-content: center; margin-bottom: 30px; flex-wrap: wrap; }
+.stat-card { background: #1e293b; border-radius: 12px; padding: 15px 25px; text-align: center; min-width: 120px; }
+.stat-card .num { font-size: 2rem; font-weight: 700; }
+.stat-card .label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+@media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+.card { background: #1e293b; border-radius: 12px; padding: 20px; }
+.card h2 { font-size: 1.2rem; margin-bottom: 15px; color: #f8fafc; }
+.post-card { background: #0f172a; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.post-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.layer-badge { color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+.sentiment-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.handle { color: #60a5fa; font-size: 0.85rem; }
+.date { color: #64748b; font-size: 0.8rem; margin-left: auto; }
+.post-text { font-size: 0.9rem; line-height: 1.4; margin-bottom: 6px; }
+.post-stats { display: flex; gap: 15px; font-size: 0.8rem; color: #94a3b8; }
+.layer-card { background: #0f172a; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+.layer-header { display: flex; justify-content: space-between; align-items: center; padding-left: 10px; }
+.layer-header h3 { font-size: 1rem; }
+.post-count { color: #94a3b8; font-size: 0.85rem; }
+.sentiment-bar { display: flex; gap: 10px; margin-top: 6px; padding-left: 14px; font-size: 0.85rem; }
+.s-pos { color: #10B981; } .s-neu { color: #6B7280; } .s-neg { color: #EF4444; }
+.trending-item { padding: 8px 0; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; }
+.trending-topic { font-weight: 500; }
+.trending-count { color: #94a3b8; font-size: 0.85rem; }
+.log-entry { display: flex; justify-content: space-between; padding: 4px 0; font-size: 0.8rem; color: #94a3b8; border-bottom: 1px solid #1e293b; }
+.chart-container { position: relative; height: 300px; }
 </style>
 </head>
 <body>
-<div class="container">
 <h1>X Sentiment Dashboard</h1>
-<p class="subtitle">AI & Tech Topic Tracker &bull; Last updated: 2026-03-23 12:16 UTC &bull; Total posts: 43</p>
+<p class="subtitle">AI Agents &amp; Topics &mdash; Last updated: 2026-03-23 15:21 UTC</p>
+
+<div class="stats-row">
+    <div class="stat-card"><div class="num">107</div><div class="label">Total Posts</div></div>
+    <div class="stat-card"><div class="num" style="color:#10B981">6</div><div class="label">Positive</div></div>
+    <div class="stat-card"><div class="num" style="color:#6B7280">90</div><div class="label">Neutral</div></div>
+    <div class="stat-card"><div class="num" style="color:#EF4444">11</div><div class="label">Negative</div></div>
+</div>
 
 <div class="grid">
-    <div class="card"><h3>AI Agents</h3><div class="stat">7</div><div style="margin-top:5px"><span class="sentiment-positive">1 pos</span> &bull; <span class="sentiment-neutral">6 neu</span> &bull; <span class="sentiment-negative">0 neg</span></div></div><div class="card"><h3>Crypto AI</h3><div class="stat">8</div><div style="margin-top:5px"><span class="sentiment-positive">3 pos</span> &bull; <span class="sentiment-neutral">5 neu</span> &bull; <span class="sentiment-negative">0 neg</span></div></div><div class="card"><h3>XRP / Ripple</h3><div class="stat">8</div><div style="margin-top:5px"><span class="sentiment-positive">2 pos</span> &bull; <span class="sentiment-neutral">5 neu</span> &bull; <span class="sentiment-negative">1 neg</span></div></div><div class="card"><h3>Singularity / AGI</h3><div class="stat">6</div><div style="margin-top:5px"><span class="sentiment-positive">1 pos</span> &bull; <span class="sentiment-neutral">5 neu</span> &bull; <span class="sentiment-negative">0 neg</span></div></div><div class="card"><h3>Local AI</h3><div class="stat">5</div><div style="margin-top:5px"><span class="sentiment-positive">0 pos</span> &bull; <span class="sentiment-neutral">5 neu</span> &bull; <span class="sentiment-negative">0 neg</span></div></div><div class="card"><h3>Indie SaaS</h3><div class="stat">5</div><div style="margin-top:5px"><span class="sentiment-positive">1 pos</span> &bull; <span class="sentiment-neutral">3 neu</span> &bull; <span class="sentiment-negative">1 neg</span></div></div><div class="card"><h3>PM + AI</h3><div class="stat">4</div><div style="margin-top:5px"><span class="sentiment-positive">0 pos</span> &bull; <span class="sentiment-neutral">4 neu</span> &bull; <span class="sentiment-negative">0 neg</span></div></div><div class="card"><h3>Trending</h3><div class="stat">0</div><div style="margin-top:5px"><span class="sentiment-positive">0 pos</span> &bull; <span class="sentiment-neutral">0 neu</span> &bull; <span class="sentiment-negative">0 neg</span></div></div>
-</div>
-
-<div class="chart-container">
-<h2>Sentiment by Layer</h2>
-<canvas id="sentimentChart"></canvas>
-</div>
-
-<div class="chart-container">
-<h2>Post Volume by Layer</h2>
-<canvas id="volumeChart"></canvas>
-</div>
-
-<h2>Trending Topics</h2>
-<div class="card">
-<div class="trending-item"><span class="topic">OpenClaw Open-Source AI Agent Platform Reaches 250,000 GitHub Stars in 60 Days</span> <span class="count">(262 posts)</span></div><div class="trending-item"><span class="topic">Obsidian and Claude Code Create 24/7 Personal Operating System</span> <span class="count">(335 posts)</span></div><div class="trending-item"><span class="topic">Arson Destroys Jewish Volunteer Ambulances in Golders Green</span> <span class="count">(206.4K posts)</span></div><div class="trending-item"><span class="topic">Trump Issues 48-Hour Ultimatum to Iran Over Strait of Hormuz</span> <span class="count">(1.6M posts)</span></div><div class="trending-item"><span class="topic">$GOLD</span></div><div class="trending-item"><span class="topic">extreme fear</span></div><div class="trending-item"><span class="topic">VeVe</span></div><div class="trending-item"><span class="topic">Trump</span></div><div class="trending-item"><span class="topic">West Ham</span></div><div class="trending-item"><span class="topic">Cherki</span></div><div class="trending-item"><span class="topic">Havertz</span></div><div class="trending-item"><span class="topic">Ambulances</span></div><div class="trending-item"><span class="topic">Chappell Roan</span></div><div class="trending-item"><span class="topic">Diego Garcia</span></div><div class="trending-item"><span class="topic">Cadbury</span></div><div class="trending-item"><span class="topic">Raya</span></div><div class="trending-item"><span class="topic">#CarabaoCup</span></div><div class="trending-item"><span class="topic">Spurs</span></div><div class="trending-item"><span class="topic">Saka</span></div><div class="trending-item"><span class="topic">Sunderland</span></div>
-</div>
-
-<h2>Top Posts (by Likes)</h2>
-<div class="post-card">
-            <div class="post-header"><strong>@Rohan Paul</strong> <span class="layer-tag">AI Agents</span>
-            <span class="sentiment-positive">positive</span></div>
-            <div class="post-text">Chamath on how AI agents are making the 10x engineer distinction disappear because the most efficient code paths are now obvious to everyone. Just as AI solved chess and removed the mystery of the bes...</div>
-            <div class="post-stats">&#x1f4ac; 274 &nbsp; &#x1f501; 203 &nbsp; &#x2764; 994 &nbsp; &#x1f441; 809K</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Hugo Philion</strong> <span class="layer-tag">XRP / Ripple</span>
-            <span class="sentiment-positive">positive</span></div>
-            <div class="post-text">I do love watching Flare FUD reach fever pitch over geopolitical instability. Others, bigger (cough cough Coinbase), have tried but Flare is the only project that has successfully turned XRP into coll...</div>
-            <div class="post-stats">&#x1f4ac; 108 &nbsp; &#x1f501; 242 &nbsp; &#x2764; 946 &nbsp; &#x1f441; 0</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Fraser Cottrell</strong> <span class="layer-tag">AI Agents</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">Claude + Obsidian = A true AI employee. I gave AI a brain, and now it runs half my business. It took an afternoon to build. It costs almost nothing to run. And it's the single biggest unlock I've foun...</div>
-            <div class="post-stats">&#x1f4ac; 36 &nbsp; &#x1f501; 45 &nbsp; &#x2764; 716 &nbsp; &#x1f441; 219K</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@kouji</strong> <span class="layer-tag">XRP / Ripple</span>
-            <span class="sentiment-positive">positive</span></div>
-            <div class="post-text">This is not financial advice or anything of the sort; it is merely the result of an amateur like myself arbitrarily predicting the timing of an XRP surge. Many XRP holders believe the Clarity Act is a...</div>
-            <div class="post-stats">&#x1f4ac; 44 &nbsp; &#x1f501; 53 &nbsp; &#x2764; 584 &nbsp; &#x1f441; 0</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@The Curious Tales</strong> <span class="layer-tag">Singularity / AGI</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">BREAKING: AI professor argues the universe may be a simulated lab designed to engineer superintelligence and it might be nearing shutdown.</div>
-            <div class="post-stats">&#x1f4ac; 87 &nbsp; &#x1f501; 58 &nbsp; &#x2764; 570 &nbsp; &#x1f441; 0</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Miles Deutscher</strong> <span class="layer-tag">Crypto AI</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">New phrase to keep an eye on: DePAI. Will be one of the biggest trends in crypto over the coming 1-2 years. Stands for Decentralised Physical AI Infrastructure Stack: AI agents, On-chain robotics, Cro...</div>
-            <div class="post-stats">&#x1f4ac; 143 &nbsp; &#x1f501; 101 &nbsp; &#x2764; 548 &nbsp; &#x1f441; 88K</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Florian Darroman</strong> <span class="layer-tag">Indie SaaS</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">This guy built a 1M ARR SaaS in 117 days (he had 16 followers) and now just hit 8M ARR. 100% Bootstrapped. yasser_elsaid_ is the perfect example that you don't need a personal brand or VCs to make it.</div>
-            <div class="post-stats">&#x1f4ac; 31 &nbsp; &#x1f501; 42 &nbsp; &#x2764; 546 &nbsp; &#x1f441; 0</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@andrew chen</strong> <span class="layer-tag">PM + AI</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">Today the job of the PM is the define the product, how it works, and how it'll get built. But we won't need that soon. The future job will be simple to define the goals, the constraints, and long term...</div>
-            <div class="post-stats">&#x1f4ac; 135 &nbsp; &#x1f501; 60 &nbsp; &#x2764; 494 &nbsp; &#x1f441; 0</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Dustin</strong> <span class="layer-tag">PM + AI</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">Bret Taylor, former co-CEO of Salesforce and chair of OpenAI, just redefined the unit of productivity. It's not a person. It's a process. Taylor: I think the atomic unit of productivity in AI is a pro...</div>
-            <div class="post-stats">&#x1f4ac; 30 &nbsp; &#x1f501; 95 &nbsp; &#x2764; 479 &nbsp; &#x1f441; 0</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@0xMarioNawfal</strong> <span class="layer-tag">Crypto AI</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">AI AGENTS CAN NOW USE CRYPTO FULLY AUTONOMOUS. PAY, TRADE, BUILD APPS, ALL IN 1 PROMPT</div>
-            <div class="post-stats">&#x1f4ac; 51 &nbsp; &#x1f501; 45 &nbsp; &#x2764; 347 &nbsp; &#x1f441; 64K</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Simon Dedic</strong> <span class="layer-tag">Crypto AI</span>
-            <span class="sentiment-positive">positive</span></div>
-            <div class="post-text">Congrats to everyone who held onto their crypto x AI coins. Billions of agents are about to come onchain to transact trillions of dollars. Imagine owning the rails.</div>
-            <div class="post-stats">&#x1f4ac; 91 &nbsp; &#x1f501; 44 &nbsp; &#x2764; 338 &nbsp; &#x1f441; 45K</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Rohan Paul</strong> <span class="layer-tag">Local AI</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">Google just dropped AI agents into the planet's biggest application, Google Map. Launched today across the United States and India. This fundamentally positions an AI model as the primary gatekeeper b...</div>
-            <div class="post-stats">&#x1f4ac; 23 &nbsp; &#x1f501; 64 &nbsp; &#x2764; 282 &nbsp; &#x1f441; 0</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Cointelegraph</strong> <span class="layer-tag">Crypto AI</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">JUST IN: Visa Crypto Labs launches Visa CLI, a command line commerce tool that lets AI agents make secure card payments as you code.</div>
-            <div class="post-stats">&#x1f4ac; 33 &nbsp; &#x1f501; 26 &nbsp; &#x2764; 163 &nbsp; &#x1f441; 18K</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Ripple Bull Winkle</strong> <span class="layer-tag">XRP / Ripple</span>
-            <span class="sentiment-neutral">neutral</span></div>
-            <div class="post-text">Evernorth just confirmed what most people still think is speculation. And the implications are bigger than anyone is reporting.</div>
-            <div class="post-stats">&#x1f4ac; 1 &nbsp; &#x1f501; 10 &nbsp; &#x2764; 135 &nbsp; &#x1f441; 0</div>
-        </div><div class="post-card">
-            <div class="post-header"><strong>@Miles Deutscher</strong> <span class="layer-tag">Crypto AI</span>
-            <span class="sentiment-positive">positive</span></div>
-            <div class="post-text">This HeyAnonai demo is exactly why I'm bullish on the future of crypto x AI agents. I wish I had this last year and in 2021.</div>
-            <div class="post-stats">&#x1f4ac; 18 &nbsp; &#x1f501; 15 &nbsp; &#x2764; 121 &nbsp; &#x1f441; 27K</div>
+    <div class="card">
+        <h2>Sentiment by Layer</h2>
+        <div class="chart-container"><canvas id="sentimentChart"></canvas></div>
+    </div>
+    <div class="card">
+        <h2>Layer Summary</h2>
+        
+        <div class="layer-card">
+            <div class="layer-header" style="border-left: 4px solid #4F46E5">
+                <h3>AI Agents</h3>
+                <span class="post-count">12 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <span class="s-pos" title="Positive">0</span>
+                <span class="s-neu" title="Neutral">11</span>
+                <span class="s-neg" title="Negative">1</span>
+            </div>
         </div>
-
-<h2>Scrape Log (Recent)</h2>
-<div class="card">
-<table>
-<tr><th>Layer</th><th>Tweets</th><th>Time</th></tr>
-<tr><td>Trending</td><td>30</td><td>2026-03-23T12:15:50.131931</td></tr><tr><td>PM + AI</td><td>4</td><td>2026-03-23T12:14:41.246324</td></tr><tr><td>Indie SaaS</td><td>5</td><td>2026-03-23T12:13:58.650849</td></tr><tr><td>Local AI</td><td>5</td><td>2026-03-23T12:12:55.915336</td></tr><tr><td>Singularity / AGI</td><td>6</td><td>2026-03-23T12:12:06.424065</td></tr><tr><td>XRP / Ripple</td><td>8</td><td>2026-03-23T12:11:05.737055</td></tr><tr><td>Crypto AI</td><td>8</td><td>2026-03-23T12:09:42.615962</td></tr><tr><td>AI Agents</td><td>7</td><td>2026-03-23T12:08:24.010789</td></tr>
-</table>
+        <div class="layer-card">
+            <div class="layer-header" style="border-left: 4px solid #F59E0B">
+                <h3>Crypto AI</h3>
+                <span class="post-count">16 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <span class="s-pos" title="Positive">2</span>
+                <span class="s-neu" title="Neutral">13</span>
+                <span class="s-neg" title="Negative">1</span>
+            </div>
+        </div>
+        <div class="layer-card">
+            <div class="layer-header" style="border-left: 4px solid #3B82F6">
+                <h3>XRP / Ripple</h3>
+                <span class="post-count">19 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <span class="s-pos" title="Positive">2</span>
+                <span class="s-neu" title="Neutral">17</span>
+                <span class="s-neg" title="Negative">0</span>
+            </div>
+        </div>
+        <div class="layer-card">
+            <div class="layer-header" style="border-left: 4px solid #EF4444">
+                <h3>Singularity / AGI</h3>
+                <span class="post-count">14 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <span class="s-pos" title="Positive">0</span>
+                <span class="s-neu" title="Neutral">13</span>
+                <span class="s-neg" title="Negative">1</span>
+            </div>
+        </div>
+        <div class="layer-card">
+            <div class="layer-header" style="border-left: 4px solid #10B981">
+                <h3>Local AI</h3>
+                <span class="post-count">14 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <span class="s-pos" title="Positive">0</span>
+                <span class="s-neu" title="Neutral">13</span>
+                <span class="s-neg" title="Negative">1</span>
+            </div>
+        </div>
+        <div class="layer-card">
+            <div class="layer-header" style="border-left: 4px solid #8B5CF6">
+                <h3>Indie SaaS</h3>
+                <span class="post-count">18 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <span class="s-pos" title="Positive">2</span>
+                <span class="s-neu" title="Neutral">16</span>
+                <span class="s-neg" title="Negative">0</span>
+            </div>
+        </div>
+        <div class="layer-card">
+            <div class="layer-header" style="border-left: 4px solid #EC4899">
+                <h3>PM + AI Jobs</h3>
+                <span class="post-count">14 posts</span>
+            </div>
+            <div class="sentiment-bar">
+                <span class="s-pos" title="Positive">0</span>
+                <span class="s-neu" title="Neutral">7</span>
+                <span class="s-neg" title="Negative">7</span>
+            </div>
+        </div>
+    </div>
 </div>
 
+<div class="grid">
+    <div class="card">
+        <h2>Top Posts by Engagement</h2>
+        
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#10B981">Local AI</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@God of Prompt</span>
+                <span class="date">Mar 21</span>
+            </div>
+            <div class="post-text">BREAKING: Someone just open-sourced a full offline survival computer with AI, Wikipedia, and everything you need. Project NOMAD.</div>
+            <div class="post-stats">
+                <span>&#x2764; 23K</span>
+                <span>&#x1F504; 3.4K</span>
+                <span>&#x1F4AC; 356</span>
+                <span>&#x1F441; 4.2M</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#F59E0B">Crypto AI</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Brian Armstrong</span>
+                <span class="date">Mar 9</span>
+            </div>
+            <div class="post-text">Very soon there are going to be more AI agents than humans making transactions. They can't open a bank account, but they can own a crypto wallet. Think about it.</div>
+            <div class="post-stats">
+                <span>&#x2764; 20K</span>
+                <span>&#x1F504; 3.8K</span>
+                <span>&#x1F4AC; 2.2K</span>
+                <span>&#x1F441; 4.6M</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#8B5CF6">Indie SaaS</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@levelsio</span>
+                <span class="date">Feb 24</span>
+            </div>
+            <div class="post-text">how to build a bootstrapped startup without funding: 1. pick a problem you personally have. if you don't use your own product daily, quit now. 2. skip the pitch deck, ship something ugly in a weekend. 3. charge money from day 1.</div>
+            <div class="post-stats">
+                <span>&#x2764; 12K</span>
+                <span>&#x1F504; 1.1K</span>
+                <span>&#x1F4AC; 727</span>
+                <span>&#x1F441; 609K</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#EF4444">Singularity / AGI</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Polymarket</span>
+                <span class="date">Mar 14</span>
+            </div>
+            <div class="post-text">JUST IN: Renowned AI professor claims the universe is a simulation created to develop superintelligence.</div>
+            <div class="post-stats">
+                <span>&#x2764; 11K</span>
+                <span>&#x1F504; 2.1K</span>
+                <span>&#x1F4AC; 1.8K</span>
+                <span>&#x1F441; 0</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#4F46E5">AI Agents</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@TFTC</span>
+                <span class="date">Mar 19</span>
+            </div>
+            <div class="post-text">Jensen Huang: If that $500,000 engineer did not consume at least $250,000 worth of tokens, I am going to be deeply alarmed. This is no different than a chip designer who says I'm just going to use paper and pencil.</div>
+            <div class="post-stats">
+                <span>&#x2764; 7.9K</span>
+                <span>&#x1F504; 1.1K</span>
+                <span>&#x1F4AC; 477</span>
+                <span>&#x1F441; 2.8M</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#EF4444">Singularity / AGI</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@All day Astronomy</span>
+                <span class="date">Mar 14</span>
+            </div>
+            <div class="post-text">NEWS: Renowned AI professor claims the universe is a simulation created to develop superintelligence and will soon be turned off.</div>
+            <div class="post-stats">
+                <span>&#x2764; 5K</span>
+                <span>&#x1F504; 575</span>
+                <span>&#x1F4AC; 579</span>
+                <span>&#x1F441; 895K</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#10B981">Local AI</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Ballaz</span>
+                <span class="date">Mar 17</span>
+            </div>
+            <div class="post-text">A new startup idea just dropped: 1. DM local businesses - hey, you're losing money because you don't have a website. I'll build you one with AI for free.</div>
+            <div class="post-stats">
+                <span>&#x2764; 4.3K</span>
+                <span>&#x1F504; 252</span>
+                <span>&#x1F4AC; 115</span>
+                <span>&#x1F441; 0</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#8B5CF6">Indie SaaS</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Ben Lang</span>
+                <span class="date">Mar 30, 2025</span>
+            </div>
+            <div class="post-text">Met a solo founder (no employees) who's on track to hit $25M ARR later this year.</div>
+            <div class="post-stats">
+                <span>&#x2764; 4.1K</span>
+                <span>&#x1F504; 205</span>
+                <span>&#x1F4AC; 257</span>
+                <span>&#x1F441; 0</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#4F46E5">AI Agents</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Roan</span>
+                <span class="date">Mar 17</span>
+            </div>
+            <div class="post-text">I don't usually share AI stuff because most of it is slop, but this is the most insane thing I've read today. People are already building companies with AI agents and raising capital.</div>
+            <div class="post-stats">
+                <span>&#x2764; 4.1K</span>
+                <span>&#x1F504; 368</span>
+                <span>&#x1F4AC; 79</span>
+                <span>&#x1F441; 1M</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#EC4899">PM + AI Jobs</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Tuki</span>
+                <span class="date">Mar 20</span>
+            </div>
+            <div class="post-text">Do you understand what JPMorgan just said in plain English. Stop scrolling and listen. AI replacing jobs at unprecedented scale.</div>
+            <div class="post-stats">
+                <span>&#x2764; 3.9K</span>
+                <span>&#x1F504; 1K</span>
+                <span>&#x1F4AC; 114</span>
+                <span>&#x1F441; 838K</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#4F46E5">AI Agents</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Shubham Saboo</span>
+                <span class="date">Mar 2</span>
+            </div>
+            <div class="post-text">This is what a one-person AI Agent run company looks like in 2026. 6 AI agents. 20 cron jobs. 0 human employees.</div>
+            <div class="post-stats">
+                <span>&#x2764; 3.5K</span>
+                <span>&#x1F504; 435</span>
+                <span>&#x1F4AC; 245</span>
+                <span>&#x1F441; 0</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#F59E0B">Crypto AI</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Jungle Inc Crypto News</span>
+                <span class="date">Jan 24</span>
+            </div>
+            <div class="post-text">The Old Way of running a company is dead. Brian Armstrong just revealed how he's using AI agents to run Coinbase.</div>
+            <div class="post-stats">
+                <span>&#x2764; 2.9K</span>
+                <span>&#x1F504; 320</span>
+                <span>&#x1F4AC; 74</span>
+                <span>&#x1F441; 278K</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#8B5CF6">Indie SaaS</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@0xMarioNawfal</span>
+                <span class="date">Mar 2</span>
+            </div>
+            <div class="post-text">This is the solo startup cheatsheet. n8n automation. Supabase backend. Cursor code. Claude thinking. Vercel deploy. Stripe payments. Resend emails. Framer landing page. PostHog analytics. Cloudflare security.</div>
+            <div class="post-stats">
+                <span>&#x2764; 2.3K</span>
+                <span>&#x1F504; 243</span>
+                <span>&#x1F4AC; 86</span>
+                <span>&#x1F441; 154K</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#3B82F6">XRP / Ripple</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Coinbase</span>
+                <span class="date">Feb 18</span>
+            </div>
+            <div class="post-text">Holding XRP, DOGE, ADA, or LTC? Now you can unlock the value of your portfolio without giving up your crypto.</div>
+            <div class="post-stats">
+                <span>&#x2764; 2.3K</span>
+                <span>&#x1F504; 638</span>
+                <span>&#x1F4AC; 317</span>
+                <span>&#x1F441; 0</span>
+            </div>
+        </div>
+        <div class="post-card">
+            <div class="post-meta">
+                <span class="layer-badge" style="background:#4F46E5">AI Agents</span>
+                <span class="sentiment-dot" style="background:#6B7280"></span>
+                <span class="handle">@Guri Singh</span>
+                <span class="date">Mar 17</span>
+            </div>
+            <div class="post-text">BREAKING: Someone just open sourced a complete AI agency and it hit 50K GitHub stars in under two weeks.</div>
+            <div class="post-stats">
+                <span>&#x2764; 2.3K</span>
+                <span>&#x1F504; 406</span>
+                <span>&#x1F4AC; 115</span>
+                <span>&#x1F441; 0</span>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Trending on X</h2>
+        <div class="trending-item"><span class="trending-topic">Israel Strikes Tehran</span> <span class="trending-count">42K posts</span></div><div class="trending-item"><span class="trending-topic">XRP Holders Eye SEC ETF Deadline</span> <span class="trending-count">13K posts</span></div><div class="trending-item"><span class="trending-topic">Swift Cross-Border Payments</span> <span class="trending-count">2.1K posts</span></div><div class="trending-item"><span class="trending-topic">70mm IMAX</span></div><div class="trending-item"><span class="trending-topic">Forest</span></div><div class="trending-item"><span class="trending-topic">Cherki</span></div><div class="trending-item"><span class="trending-topic">Tobey</span></div><div class="trending-item"><span class="trending-topic">$TEDDY</span></div><div class="trending-item"><span class="trending-topic">Barron</span></div><div class="trending-item"><span class="trending-topic">Raya</span></div><div class="trending-item"><span class="trending-topic">Adolf</span></div><div class="trending-item"><span class="trending-topic">#SAFC</span></div><div class="trending-item"><span class="trending-topic">Witch</span></div><div class="trending-item"><span class="trending-topic">TACO</span></div><div class="trending-item"><span class="trending-topic">Saka</span></div><div class="trending-item"><span class="trending-topic">Sunderland</span></div><div class="trending-item"><span class="trending-topic">Wembley</span></div><div class="trending-item"><span class="trending-topic">Hatzola</span></div><div class="trending-item"><span class="trending-topic">#NUFC</span></div><div class="trending-item"><span class="trending-topic">#arsmci</span></div><div class="trending-item"><span class="trending-topic">Arteta</span></div><div class="trending-item"><span class="trending-topic">Leonid Radvinsky</span></div><div class="trending-item"><span class="trending-topic">Arsenal</span></div><div class="trending-item"><span class="trending-topic">Kepa</span></div><div class="trending-item"><span class="trending-topic">Easter</span></div>
+        <h2 style="margin-top:20px">Scrape Log</h2>
+        <div class="log-entry"><span>Trending</span><span>25 posts</span><span>2026-03-23T15:21</span></div><div class="log-entry"><span>PM + AI Jobs</span><span>14 posts</span><span>2026-03-23T15:20</span></div><div class="log-entry"><span>Indie SaaS</span><span>18 posts</span><span>2026-03-23T15:19</span></div><div class="log-entry"><span>Local AI</span><span>14 posts</span><span>2026-03-23T15:17</span></div><div class="log-entry"><span>Singularity / AGI</span><span>14 posts</span><span>2026-03-23T15:15</span></div><div class="log-entry"><span>XRP / Ripple</span><span>19 posts</span><span>2026-03-23T15:14</span></div><div class="log-entry"><span>Crypto AI</span><span>16 posts</span><span>2026-03-23T15:12</span></div><div class="log-entry"><span>AI Agents</span><span>12 posts</span><span>2026-03-23T15:10</span></div>
+    </div>
 </div>
 
 <script>
-const ctx1 = document.getElementById('sentimentChart').getContext('2d');
-new Chart(ctx1, {
+new Chart(document.getElementById('sentimentChart'), {
     type: 'bar',
     data: {
-        labels: ["AI Agents", "Crypto AI", "XRP / Ripple", "Singularity / AGI", "Local AI", "Indie SaaS", "PM + AI", "Trending"],
+        labels: ["AI Agents", "Crypto AI", "XRP / Ripple", "Singularity / AGI", "Local AI", "Indie SaaS", "PM + AI Jobs"],
         datasets: [
-            { label: 'Positive', data: [1, 3, 2, 1, 0, 1, 0, 0], backgroundColor: '#3fb950' },
-            { label: 'Neutral', data: [6, 5, 5, 5, 5, 3, 4, 0], backgroundColor: '#484f58' },
-            { label: 'Negative', data: [0, 0, 1, 0, 0, 1, 0, 0], backgroundColor: '#f85149' }
+            { label: 'Positive', data: [0, 2, 2, 0, 0, 2, 0], backgroundColor: '#10B981' },
+            { label: 'Neutral', data: [11, 13, 17, 13, 13, 16, 7], backgroundColor: '#475569' },
+            { label: 'Negative', data: [1, 1, 0, 1, 1, 0, 7], backgroundColor: '#EF4444' }
         ]
     },
     options: {
-        responsive: true,
-        scales: { x: { stacked: true, ticks: { color: '#8b949e' } }, y: { stacked: true, ticks: { color: '#8b949e' } } },
-        plugins: { legend: { labels: { color: '#c9d1d9' } } }
-    }
-});
-
-const ctx2 = document.getElementById('volumeChart').getContext('2d');
-new Chart(ctx2, {
-    type: 'doughnut',
-    data: {
-        labels: ["AI Agents", "Crypto AI", "XRP / Ripple", "Singularity / AGI", "Local AI", "Indie SaaS", "PM + AI", "Trending"],
-        datasets: [{ data: [7, 8, 8, 6, 5, 5, 4, 0], backgroundColor: ['#58a6ff','#bc8cff','#f78166','#d2a8ff','#3fb950','#f0883e','#a371f7','#79c0ff'] }]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: '#c9d1d9' }, position: 'bottom' } }
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#94a3b8' } } },
+        scales: {
+            x: { stacked: true, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+            y: { stacked: true, ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+        }
     }
 });
 </script>
