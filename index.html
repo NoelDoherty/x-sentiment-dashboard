@@ -3,255 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Agents X Sentiment Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<title>X Sentiment Dashboard - AI & Crypto Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; padding: 20px; }
-hm { text-align: center; color: #f8fafc; margin-bottom: 5px; font-size: 28px; }
-.subtitle { text-align: center; color: #94a3b8; margin-bottom: 30px; font-size: 14px; }
-h2 { color: #f1f5f9; margin: 25px 0 15px; font-size: 20px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 30px; }
-.card { background: #1e293b; border-radius: 12px; padding: 18px; }
-.card h3 { color: #f1f5f9; margin-bottom: 12px; font-size: 16px; }
-.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
-.stat-num { display: block; font-size: 22px; font-weight: 700; color: #f8fafc; }
-.stat-num.pos { color: #4ade80; }
-.stat-num.neg { color: #f87171; }
-.stat-num.neu { color: #fbf24e; }
-.stat-label { font-size: 11px; color: #94a3b8; text-transform: uppercase; }
-.engagement { color: #94a3b8; font-size: 13px; margin-top: 8px; }
-.avg-score { color: #cbd5e1; font-size: 13px; margin-top: 6px; }
-.chart-container { background: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 30px; }
-.trending-item { background: #1e293b; border-radius: 8px; padding: 10px 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
-.trending-topic { color: #f1f5f9; font-weight: 600; }
-.trending-cat { color: #94a3b8; font-size: 12px; background: #334155; padding: 2px 8px; border-radius: 4px; }
-.trending-count { color: #647484; font-size: 12px; margin-left: auto; }
-.post-card { background: #1e293b; border-radius: 10px; padding: 14px; margin-bottom: 10px; }
-.post-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
-.post-author { color: #f1f5f9; font-weight: 600; font-size: 14px; }
-.post-handle { color: #647484; font-size: 13px; }
-.layer-badge { color: white; font-size: 11px; padding: 2px 8px: border-radius: 4px; font-weight: 600; }
-.sentiment-badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
-.sentiment-badge.pos { background: #165634; color: #4ade80; }
-.sentiment-badge.neg { background: #7f1d1d; color: #f87171; }
-.sentiment-badge.neu { background: #713f12; color: #fbf24e; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 24px 32px; border-bottom: 1px solid #334155; }
+.header h1 { font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.header .subtitle { color: #94a3b8; font-size: 14px; margin-top: 4px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+.stat-card .label { color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+.stat-card .sub { color: #64748b; font-size: 12px; margin-top: 2px; }
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+@media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+.chart-card { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; }
+.chart-card h3 { font-size: 16px; margin-bottom: 16px; color: #e2e8f0; }
+.section { background: #1e293b; border-radius: 12px; padding: 20px; border: 1px solid #334155; margin-bottom: 24px; }
+.section h3 { font-size: 16px; margin-bottom: 16px; color: #e2e8f0; }
+.trending-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.trend-tag { background: #334155; color: #e2e8f0; padding: 6px 12px; border-radius: 20px; font-size: 13px; }
+.trend-tag .cat { color: #94a3b8; font-size: 11px; }
+.layer-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.layer-tab { background: #334155; color: #94a3b8; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+.layer-tab.active { background: #3b82f6; color: white; }
+.layer-tab:hover { background: #475569; color: white; }
+.posts-list { display: flex; flex-direction: column; gap: 12px; }
+.post-card { background: #0f172a; border-radius: 8px; padding: 16px; border: 1px solid #334155; }
+.post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.post-handle { color: #60a5fa; font-weight: 600; font-size: 14px; }
+.post-date { color: #64748b; font-size: 12px; }
 .post-text { color: #cbd5e1; font-size: 14px; line-height: 1.5; margin-bottom: 8px; }
-.post-engagement { color: #647484; font-size: 12px; }
-table { width: 100%; border-collapse: collapse; background: #1e293b; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
-th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #334155; font-size: 13px; }
-th { background: #334155; color: #f1f5f9; font-weight: 600; }
-td { color: #cbd5e1; }
-.footer { text-align: center; color: #475569; font-size: 12px; margin-top: 40px; padding: 20px; }
+.post-metrics { display: flex; gap: 16px; color: #64748b; font-size: 12px; }
+.post-metrics span { display: flex; align-items: center; gap: 4px; }
+.sentiment-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.sentiment-pos { background: #064e3b; color: #6ee7b7; }
+.sentiment-neg { background: #7f1d1d; color: #fca5a5; }
+.sentiment-neu { background: #1e293b; color: #94a3b8; }
+.footer { text-align: center; color: #475569; font-size: 12px; padding: 24px; }
 </style>
 </head>
 <body>
-<h1>AI Agents X Sentiment Dashboard</h1>
-<p class="subtitle">Last updated: 2026-03-24 15:18 UTC • Tracking 8 layers of AI/crypto discourse on X.com</p>
-
-<h2>Layer Overview</h2>
-<div class="grid">
-    <div class="card" style="border-left: 4px solid #6366f1">
-        <h3>AI Agents 🤖</h3>
-        <div class="stat-grid">
-            <div><span class="stat-num">9</span><span class="stat-label">posts</span></div>
-            <div><span class="stat-num pos">0</span><span class="stat-label">positive</span></div>
-            <div><span class="stat-num neg">1</span><span class="stat-label">negative</span></div>
-            <div><span class="stat-num neu">8</span><span class="stat-label">neutral</span></div>
-        </div>
-        <div class="engagement">👍 10.5K &nbsp; 💬 1.5K &nbsp; 🔄 1.6M</div>
-        <div class="avg-score">Avg sentiment: <strong>-0.11</strong></div>
-    </div>
-    <div class="card" style="border-left: 4px solid #f59e0b">
-        <h3>Crypto AI Agents 🔐</h3>
-        <div class="stat-grid">
-            <div><span class="stat-num">9</span><span class="stat-label">posts</span></div>
-            <div><span class="stat-num pos">1</span><span class="stat-label">positive</span></div>
-            <div><span class="stat-num neg">1</span><span class="stat-label">negative</span></div>
-            <div><span class="stat-num neu">7</span><span class="stat-label">neutral</span></div>
-        </div>
-        <div class="engagement">👍 1.1K &nbsp; 💬 236 &nbsp; 🔄 123.0K</div>
-        <div class="avg-score">Avg sentiment: <strong>0.00</strong></div>
-    </div>
-    <div class="card" style="border-left: 4px solid #8b5cf6">
-        <h3>Indie SaaS 🔐</h3>
-        <div class="stat-grid">
-            <div><span class="stat-num">7</span><span class="stat-label">posts</span></div>
-            <div><span class="stat-num pos">1</span><span class="stat-label">positive</span></div>
-            <div><span class="stat-num neg">1</span><span class="stat-label">negative</span></div>
-            <div><span class="stat-num neu">5</span><span class="stat-label">neutral</span></div>
-        </div>
-        <div class="engagement">👍 15.6K &nbsp; 💬 1.5K &nbsp; 🔄 1.3M</div>
-        <div class="avg-score">Avg sentiment: <strong>0.00</strong></div>
-    </div>
-    <div class="card" style="border-left: 4px solid #10b981">
-        <h3>Local AI 🤖</h3>
-        <div class="stat-grid">
-            <div><span class="stat-num">7</span><span class="stat-label">posts</span></div>
-            <div><span class="stat-num pos">0</span><span class="stat-label">positive</span></div>
-            <div><span class="stat-num neg">1</span><span class="stat-label">negative</span></div>
-            <div><span class="stat-num neu">6</span><span class="stat-label">neutral</span></div>
-        </div>
-        <div class="engagement">👍 4.6K &nbsp; 💬 388 &nbsp; 🔄 546.0K</div>
-        <div class="avg-score">Avg sentiment: <strong>-0.14</strong></div>
-    </div>
-    <div class="card" style="border-left: 4px solid #ec4899">
-        <h3>PM & AI Jobs 🤖</h3>
-        <div class="stat-grid">
-            <div><span class="stat-num">6</span><span class="stat-label">posts</span></div>
-            <div><span class="stat-num pos">0</span><span class="stat-label">positive</span></div>
-            <div><span class="stat-num neg">5</span><span class="stat-label">negative</span></div>
-            <div><span class="stat-num neu">1</span><span class="stat-label">neutral</span></div>
-        </div>
-        <div class="engagement">👍 4.1K &nbsp; 💬 804 &nbsp; 🔄 644.0K</div>
-        <div class="avg-score">Avg sentiment: <strong>-0.83</strong></div>
-    </div>
-    <div class="card" style="border-left: 4px solid #ef4444">
-        <h3>Singularity / AGI 🔐</h3>
-        <div class="stat-grid">
-            <div><span class="stat-num">7</span><span class="stat-label">posts</span></div>
-            <div><span class="stat-num pos">0</span><span class="stat-label">positive</span></div>
-            <div><span class="stat-num neg">0</span><span class="stat-label">negative</span></div>
-            <div><span class="stat-num neu">7</span><span class="stat-label">neutral</span></div>
-        </div>
-        <div class="engagement">👍 95.2K &nbsp; 💬 15.1K &nbsp; 🔄 14.8M</div>
-        <div class="avg-score">Avg sentiment: <strong>0.00</strong></div>
-    </div>
-    <div class="card" style="border-left: 4px solid #3b82f6">
-        <h3>XRP / Ripple 💸</h3>
-        <div class="stat-grid">
-            <div><span class="stat-num">8</span><span class="stat-label">posts</span></div>
-            <div><span class="stat-num pos">2</span><span class="stat-label">positive</span></div>
-            <div><span class="stat-num neg">0</span><span class="stat-label">negative</span></div>
-            <div><span class="stat-num neu">6</span><span class="stat-label">neutral</span></div>
-        </div>
-        <div class="engagement">👍 3.3K &nbsp; 💬 448 &nbsp; 🔄 549.0K</div>
-        <div class="avg-score">Avg sentiment: <strong>0.25</strong></div>
-    </div>
+<div class="header">
+  <h1>X Sentiment Dashboard</h1>
+  <div class="subtitle">AI & Crypto Narrative Tracker &middot; Last updated: 2026-03-24 18:19 UTC &middot; 86 posts across 7 layers &middot; 20 trending topics</div>
 </div>
-
-<h2>Sentiment Distribution</h2>
-<div class="chart-container">
-    <canvas id="sentimentChart" height="80"></canvas>
-</div>
-
-<h2>Sentiment Over Time</h2>
-<div class="chart-container">
-    <canvas id="timeChart" height="80"></canvas>
-</div>
-
-<h2>Trending on X</h2>
-<div class="trending-item"><span class="trending-topic">#artemis</span> <span class="trending-cat">Science</span></div>
-<div class="trending-item"><span class="trending-topic">Epic Games</span> <span class="trending-cat">Gaming</span></div>
-<div class="trending-item"><span class="trending-topic">Girlguiding</span> <span class="trending-cat">News</span></div>
-
-<h2>Top Posts Across All Layers</h2>
-
-<div class="post-card">
-    <div class="post-meta">
-        <span class="post-author">Elon Musk</span>
-        <span class="post-handle">Elon Musk</span>
-        <span class="layer-badge" style="background:#ef4444">Singularity / AGI</span>
-        <span class="sentiment-badge neu">neutral (0.00)</span>
-    </div>
-    <div class="post-text">Just started Tesla Robotaxi drives in Austin with no safety monitor in the car. Congrats to the Tesla_AI team! If youre interested in solving real-world AI which is likely to lead to AGI join Tesla AI</div>
-    <div class="post-engagement">👍 71.0K &nbsp; 💬 10.0K &nbsp; 🔄 8.6M</div>
-</div>
-
-<div class="post-card">
-    <div class="post-meta">
-        <span class="post-author">levelsiо</span>
-        <span class="post-handle">levelsiо</span>
-        <span class="layer-badge" style="background:#8b5cf6">Indie SaaS</span>
-        <span class="sentiment-badge neg">negative (-1.00)</span>
-    </div>
-    <div class="post-text">how to build a bootstrapped startup without funding 1. pick a problem you personally have. if you dont use your own product daily quit now 2. skip the pitch deck. open your code editor</div>
-    <div class="post-engagement">👍 12.0K &nbsp; 💬 1.1K &nbsp; 🔄 606.0K</div>
-</div>
-
-<div class="post-card">
-    <div class="post-meta">
-        <span class="post-author">Polymarket</span>
-        <span class="post-handle">Polymarket</span>
-        <span class="layer-badge" style="background:#ef4444">Singularity / AGI</span>
-        <span class="sentiment-badge neu">neutral (0.00)</span>
-    </div>
-    <div class="post-text">JUST IN Renowned AI professor claims the universe is a simulation created to develop superintelligence and will soon be turned off</div>
-    <div class="post-engagement">👍 11.0K &nbsp; 💬 2.1K &nbsp; 🔄 4.1M</div>
-</div>
-
-<div class="post-card">
-    <div class="post-meta">
-        <span class="post-author">Cointelegraph</span>
-        <span class="post-handle">Cointelegraph</span>
-        <span class="layer-badge" style="background:#ef4444">Singularity / AGI</span>
-        <span class="sentiment-badge neu">neutral (0.00)</span>
-    </div>
-    <div class="post-text">BIG NVIDIA CEO Jensen Huang says weve achieved AGI</div>
-    <div class="post-engagement">👍 6.7K &nbsp; 💬 1.1K &nbsp; 🔄 1.1M</div>
-</div>
-
-<div class="post-card">
-    <div class="post-meta">
-        <span class="post-author">Bark</span>
-        <span class="post-handle">Bark</span>
-        <span class="layer-badge" style="background:#ef4444">Singularity / AGI</span>
-        <span class="sentiment-badge neu">neutral (0.00)</span>
-    </div>
-    <div class="post-text">Let me explain what just happened Nvidias CEO just said theyve achieved AGI. AGI doesnt just write text or make images. AGI can think reason and perform ANY job better than an actual human. Now look at whats happening around you</div>
-    <div class="post-engagement">👍 6.5K &nbsp; 💬 1.9K &nbsp; 🔄 992.0K</div>
-</div>
-
-<div class="footer">
-Noel Doherty's AI Sentiment Tracker • Auto-updated hourly via Cowork scheduled task
-</div>
-
-<script>
-const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
-new Chart(sentimentCtx, {
-    type: 'bar',
-    data: {
-        labels: ["AI Agents", "Crypto AI Agents", "Indie SaaS", "Local AI", "PM & AI Jobs", "Singularity / AGI", "XRP / Ripple"],
-        datasets: [
-            { label: 'Positive', data: [0, 1, 1, 0, 0, 0, 2], backgroundColor: '#4ade80; },
-            { label: 'Negative', data: [1, 1, 1, 1, 5, 0, 0], backgroundColor: '#f87171; },
-            { label: 'Neutral', data: [8, 7, 5, 6, 1, 7, 6], backgroundColor: '#fbf24e; }
-        ]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: '#e2e8f0' } } },
-        scales: {
-            x: { stacked: true, ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
-            y: { stacked: true, ticks: { color: '#94a3b8' }, grid: { color: '#334155' }, title: { display: true, text: 'Sentiment Score', color: '#94a3b8' } }
-        }
-    }
-});
-
-const timeCtx = document.getElementById('timeChart').getContext('2d');
-new Chart(timeCtx, {
-    type: 'line',
-    data: {
-        labels: ["2026-03-24"],
-        datasets: [
-            {label: "AI Agents", data: [-0.111], borderColor: "#6366f1", backgroundColor: "#6366f133", tension: 0.3, fill: false},
-            {label: "Crypto AI Agents", data: [0.0], borderColor: "#f59e0b", backgroundColor: "#f59e0b33", tension: 0.3, fill: false},
-            {label: "Indie SaaS", data: [0.0], borderColor: "#8b5cf6", backgroundColor: "#8b5cf633", tension: 0.3, fill: false},
-            {label: "Local AI", data: [-0.143], borderColor: "#10b981", backgroundColor: "#10b98133", tension: 0.3, fill: false},
-            {label: "PM & AI Jobs", data: [-0.833], borderColor: "#ec4899", backgroundColor: "#ec489933", tension: 0.3, fill: false},
-            {label: "Singularity / AGI", data: [0.0], borderColor: "#ef4444", backgroundColor: "#ef444433", tension: 0.3, fill: false},
-            {label: "XRP / Ripple", data: [0.25], borderColor: "#3b82f6", backgroundColor: "#3b82f633", tension: 0.3, fill: false}
-        ]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { labels: { color: '#e2e8f0' } } },
-        scales: {
-            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
-            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' }, title: { display: true, text: 'Sentiment Score', color: '#94a3b8' } }
-        }
-    }
-});
-</script>
-</body>
-</html>
+<div class="container">
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
